@@ -9,6 +9,7 @@ export const SaVRange = (
     min,
     max,
     set,
+    ...props
   }: VNodeData & {
     value: number;
     min: number;
@@ -17,7 +18,8 @@ export const SaVRange = (
   },
   children?: Array<VNode | string>
 ) => (
-  <span>
+  // TODO: see if Fragment exists?
+  <span {...props}>
     <input
       props={{
         type: "range",
@@ -45,65 +47,101 @@ export const SaVRange = (
 );
 
 // TODO: combine stress + trauma into generic component
-export const Stress = ({
+export const HorizontalTrack = ({
+  name,
   value,
   set,
   min,
   max,
-}: {
+  style,
+  ...props
+}: VNodeData & {
+  name: string;
   value: number;
   min: number;
   max: number;
   set: (idx: number) => void;
 }) => (
-  <div>
-    <h2>Stress</h2>
-    <SaVRange value={value} set={set} min={min} max={max} />
+  <div
+    {...props}
+    style={mergeObject({ display: "flex", height: "fit-content" }, style)}
+  >
+    <h2 style={{ background: "white", color: "black", display: "flex" }}>
+      <span>{name}</span>
+      <SaVRange
+        value={value}
+        set={set}
+        min={min}
+        max={max}
+        style={{
+          background: "black",
+          marginLeft: "4px",
+          paddingLeft: "6px",
+          paddingRight: "6px",
+        }}
+      />
+    </h2>
   </div>
 );
-export const Trauma = ({
-  value,
-  set,
-  min,
-  max,
-}: {
-  value: number;
-  min: number;
-  max: number;
-  set: (idx: number) => void;
-}) => (
+
+export const Stress = (
+  props: VNodeData & {
+    value: number;
+    min: number;
+    max: number;
+    set: (idx: number) => void;
+  }
+) => <HorizontalTrack {...props} name="Stress" />;
+
+export const Trauma = (
+  props: VNodeData & {
+    value: number;
+    min: number;
+    max: number;
+    set: (idx: number) => void;
+  }
+) => <HorizontalTrack {...props} name="Trauma" />;
+
+export const Traumas = (
+  {
+    traumas,
+    toggleTrauma,
+  }: {
+    traumas: string[];
+    toggleTrauma: (traumaName: string) => void;
+  },
+  children: never
+) => (
   <div>
-    <h2>Trauma</h2>
-    <SaVRange value={value} set={set} min={min} max={max} />
-  </div>
-);
-export const Traumas = ({
-  traumas,
-  toggleTrauma,
-}: {
-  traumas: string[];
-  toggleTrauma: (traumaName: string) => void;
-}) => (
-  <ul>
     {[
-      "cold",
-      "haunted",
-      "obsessed",
-      "paranoid",
-      "reckless",
-      "soft",
-      "unstable",
-      "vicious",
-    ].map((traumaName) => (
-      <li
-        class={{ selected: traumas.includes(traumaName) }}
-        style={{ fontWeight: traumas.includes(traumaName) ? "bold" : "normal" }}
-        on={{ click: () => toggleTrauma(traumaName) }}
+      ["cold", "haunted", "obsessed", "paranoid"],
+      ["reckless", "soft", "unstable", "vicious"],
+    ].map((row) => (
+      <ul
+        style={{
+          ...(horizontalList as any),
+          ...(unstyleList as any),
+          flexWrap: "no-wrap",
+          height: "fit-content",
+        }}
       >
-        {traumaName}
-      </li>
+        {row.map((traumaName) => (
+          <li
+            class={{ selected: traumas.includes(traumaName) }}
+            style={{
+              fontWeight: traumas.includes(traumaName) ? "bold" : "normal",
+              flex: "1 1 25%",
+              height: "fit-content",
+              textAlign: "center",
+            }}
+            on={{ click: () => toggleTrauma(traumaName) }}
+          >
+            {traumaName}
+          </li>
+        ))}
+      </ul>
     ))}
-  </ul>
+  </div>
 );
 
 export const Action = ({
@@ -129,7 +167,7 @@ export const Action = ({
             style={{
               width: "1em",
               height: "100%",
-              borderRight: idx === 0 ? "1px solid black" : undefined,
+              borderRight: idx === 0 ? "1px solid white" : undefined,
               display: "flex",
               alignItems: "center",
             }}

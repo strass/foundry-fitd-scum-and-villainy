@@ -4,17 +4,34 @@
 }
 .fitd.sheet {
   box-shadow: none;
-  background: none;
 }
-.fitd.sheet section.window-content {
+.fitd.sheet > header {
+  background: rgba(10, 118, 143, 0.9);
+}
+.fitd.sheet > section.window-content {
   background: none;
+  background: rgba(19, 63, 73, 0.75);
+  color: white;
+}
+.fitd.sheet > section.window-content button {
+  color: white;
+}
+.fitd.sheet > section.window-content input {
+  border: none;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid white;
+  border-radius: 0;
+}
+.fitd.sheet > section.window-content input::placeholder, .fitd.sheet > section.window-content input::-webkit-input-placeholder, .fitd.sheet > section.window-content input:-moz-placeholder, .fitd.sheet > section.window-content input::-moz-placeholder, .fitd.sheet > section.window-content input:-ms-input-placeholder {
+  color: white;
 }
 
 .fitd-actor-sheet-grid-container {
   display: grid;
   grid-template-columns: 3fr 2fr 1fr;
   gap: 1px 1px;
-  grid-template-areas: "fitd-actor-sheet-logo                      fitd-actor-sheet-playbook-details       fitd-actor-sheet-actions" "fitd-actor-sheet-character-details         fitd-actor-sheet-moves                  fitd-actor-sheet-actions" "fitd-actor-sheet-stress-trauma             fitd-actor-sheet-moves                  fitd-actor-sheet-actions" "fitd-actor-sheet-harm-recovery-armor-stash fitd-actor-sheet-moves                  fitd-actor-sheet-rules-reference-three" "fitd-actor-sheet-notes-projects            fitd-actor-sheet-contacts-items-one     fitd-actor-sheet-items-two" "fitd-actor-sheet-rules-reference-one       fitd-actor-sheet-rules-reference-two    fitd-actor-sheet-items-two";
+  grid-template-areas: "fitd-actor-sheet-logo                      fitd-actor-sheet-playbook-details       fitd-actor-sheet-actions" "fitd-actor-sheet-character-details         fitd-actor-sheet-moves                  fitd-actor-sheet-actions" "fitd-actor-sheet-stress-trauma             fitd-actor-sheet-moves                  fitd-actor-sheet-actions" "fitd-actor-sheet-harm-armor-stash          fitd-actor-sheet-moves                  fitd-actor-sheet-rules-reference-three" "fitd-actor-sheet-notes-projects            fitd-actor-sheet-contacts-items-one     fitd-actor-sheet-items-two" "fitd-actor-sheet-rules-reference-one       fitd-actor-sheet-rules-reference-two    fitd-actor-sheet-items-two";
 }
 
 .fitd-actor-sheet-logo {
@@ -32,21 +49,16 @@
   margin-left: 4px;
 }
 
-.fitd-actor-sheet-harm-recovery-armor-stash {
+.fitd-actor-sheet-harm-armor-stash {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: 3fr 1fr;
   gap: 1px 1px;
-  grid-template-areas: "fitd-actor-sheet-harm fitd-actor-sheet-armor" "fitd-actor-sheet-recovery fitd-actor-sheet-cred-stash";
-  grid-area: fitd-actor-sheet-harm-recovery-armor-stash;
+  grid-template-areas: "fitd-actor-sheet-harm fitd-actor-sheet-armor" "fitd-actor-sheet-harm fitd-actor-sheet-cred-stash";
+  grid-area: fitd-actor-sheet-harm-armor-stash;
 }
 
 .fitd-actor-sheet-harm {
   grid-area: fitd-actor-sheet-harm;
-}
-
-.fitd-actor-sheet-recovery {
-  grid-area: fitd-actor-sheet-recovery;
 }
 
 .fitd-actor-sheet-armor {
@@ -105,6 +117,9 @@
 .fitd-actor-sheet-rules-reference-one {
   grid-area: fitd-actor-sheet-rules-reference-one;
 }
+.fitd-actor-sheet-rules-reference-one section > *:not(h3) {
+  font-size: 11px;
+}
 
 .fitd-actor-sheet-rules-reference-two {
   grid-area: fitd-actor-sheet-rules-reference-two;
@@ -160,13 +175,13 @@
 }
 .fitd-actor-sheet datalist option {
   width: 10px;
-  height: 10px;
+  height: 1em;
   background: transparent;
   transform: skew(-20deg);
-  border: 1px solid black;
+  border: 1px solid white;
   margin-right: 2px;
   color: transparent;
 }
 .fitd-actor-sheet datalist option.active {
-  background: black;
+  background: white;
 }

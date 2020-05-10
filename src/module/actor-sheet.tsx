@@ -15,6 +15,8 @@ import {
   SaVRange,
   RollButton,
 } from "./components.js";
+import { updateArray } from "./util.js";
+import { unstyleList } from "./styles.js";
 
 interface FitDItemData
   extends Omit<typeof FITD_TEMPLATE["Item"], "types" | "templates"> {}
@@ -53,6 +55,7 @@ interface FitDActorSheetDataData extends ASD, PC {
   armor: Resource<{
     name: string;
   }>[];
+  harm: Resource<{ level: number; descriptions: string[]; penalty: string }>[];
 }
 
 type FitDActorSheet = ActorSheetData & {
@@ -74,6 +77,9 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
   _renderFSXTemplate({ actor, data }: FitDActorSheet, options): VNode {
     console.log(actor, options);
 
+    const moves: FitDItems["move"][] = actor.items.filter(
+      ({ type }) => type === "move"
+    ) as any;
     const items: FitDItems["item"][] = actor.items.filter(
       ({ type }) => type === "item"
     ) as any;
@@ -207,6 +213,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
         </Grid>
         <Grid name="stress-trauma" class={{ row: true }}>
           <Stress
+            style={{ flex: "0 0 auto", paddingRight: "8px" }}
             value={data.stress.value}
             min={data.stress.min}
             max={data.stress.max}
@@ -214,41 +221,101 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               this.actor.update({ data: { stress: { value: newValue } } })
             }
           />
-          <Trauma
-            value={data.trauma.value}
-            min={data.trauma.min}
-            max={data.trauma.max}
-            set={(newValue) =>
-              this.actor.update({ data: { trauma: { value: newValue } } })
-            }
-          />
-          <Traumas
-            traumas={data.traumas}
-            toggleTrauma={(traumaName: string) => {
-              const traumaIndex = data.traumas.findIndex(
-                (trauma) => trauma === traumaName
-              );
-              traumaIndex > -1
-                ? this.actor.update({
-                    data: {
-                      traumas: [
-                        ...data.traumas.slice(0, traumaIndex),
-                        ...data.traumas.slice(traumaIndex + 1),
-                      ],
-                    },
-                  })
-                : this.actor.update({
-                    data: { traumas: [...data.traumas, traumaName] },
-                  });
-            }}
-          />
-        </Grid>
-        <Grid name="recovery-armor-stash">
-          <div>
-            <h4>HARM</h4>
+          <div style={{ flex: "0 0 auto", paddingRight: "8px" }}>
+            <Trauma
+              value={data.trauma.value}
+              min={data.trauma.min}
+              max={data.trauma.max}
+              set={(newValue) =>
+                this.actor.update({ data: { trauma: { value: newValue } } })
+              }
+            />
           </div>
-          <div>recovery clock</div>
-          <div>
+          <div style={{ flex: "0 0 auto" }}>
+            <Traumas
+              traumas={data.traumas}
+              toggleTrauma={(traumaName: string) => {
+                const traumaIndex = data.traumas.findIndex(
+                  (trauma) => trauma === traumaName
+                );
+                traumaIndex > -1
+                  ? this.actor.update({
+                      data: {
+                        traumas: [
+                          ...data.traumas.slice(0, traumaIndex),
+                          ...data.traumas.slice(traumaIndex + 1),
+                        ],
+                      },
+                    })
+                  : this.actor.update({
+                      data: { traumas: [...data.traumas, traumaName] },
+                    });
+              }}
+            />
+          </div>
+        </Grid>
+        <Grid name="harm-armor-stash">
+          <Grid name="harm">
+            <header>
+              <h4>Harm</h4>
+            </header>
+            <main>
+              {data.harm
+                .sort(({ level: levelA }, { level: levelB }) => levelB - levelA)
+                .map(({ level, max, penalty, descriptions, ...rest }, idx) => (
+                  <div
+                    class={{ row: true }}
+                    style={{ width: "100%", height: "36px" }}
+                  >
+                    <label style={{ flex: "0 0 12px" }}>{level}</label>
+                    {Array(max)
+                      .fill(undefined)
+                      .map((_, jdx) => (
+                        <input
+                          style={{
+                            flex: "1 1 auto",
+                            width: "100%",
+                            borderLeft:
+                              jdx !== 0 ? "1px solid white" : undefined,
+                          }}
+                          props={{
+                            value: descriptions![jdx] ?? "",
+                          }}
+                          on={{
+                            blur: (ev) =>
+                              this.actor.update({
+                                data: {
+                                  harm: updateArray(data.harm, idx, {
+                                    level,
+                                    max,
+                                    penalty,
+                                    descriptions: updateArray(
+                                      descriptions,
+                                      jdx,
+                                      (ev.target as HTMLInputElement).value
+                                    ),
+                                    ...rest,
+                                    value: descriptions.filter(Boolean).length,
+                                  }),
+                                },
+                              }),
+                          }}
+                        />
+                      ))}
+                    <label style={{ flex: "0 0 75px" }}>{penalty}</label>
+                  </div>
+                ))}
+            </main>
+            <footer class={{ row: true }}>
+              <h4>Recovery</h4>
+              <span>
+                Get treatment in <b>downtime</b> to fill your{" "}
+                <b>healing clock ></b>
+              </span>
+              <span>CLOCK</span>
+            </footer>
+          </Grid>
+          <Grid name="armor">
             CONFIG.debug.hooks = true
             <ul>
               {(data?.armor ?? []).map(
@@ -262,17 +329,13 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                       set={(value) =>
                         this.actor.update({
                           data: {
-                            armor: [
-                              ...arr.slice(0, idx),
-                              {
-                                name,
-                                max,
-                                min,
-                                value,
-                                ...rest,
-                              },
-                              ...arr.slice(idx + 1),
-                            ],
+                            armor: updateArray(arr, idx, {
+                              name,
+                              max,
+                              min,
+                              value,
+                              ...rest,
+                            }),
                           },
                         })
                       }
@@ -281,8 +344,8 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                 )
               )}
             </ul>
-          </div>
-          <div>cred/stash</div>
+          </Grid>
+          <Grid name="cred-stash">cred/stash</Grid>
         </Grid>
         <Grid
           name="notes-projects"
@@ -317,7 +380,19 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             />
           )}
         </Grid>
-        <Grid name="moves">moves</Grid>
+        <Grid name="moves">
+          <ul>
+            {moves.map(({ name, data: { value, max } }) => (
+              <li>
+                {Array(max)
+                  .fill(undefined)
+                  .map((_, idx) => (idx >= value ? "x" : "o"))}{" "}
+                {name}
+              </li>
+            ))}
+          </ul>
+          <button>Add Move</button>
+        </Grid>
         <Grid name="actions">
           {[
             { name: "insight", actions: insightActions },
@@ -373,11 +448,12 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                       );
                       this.actor.update({
                         data: {
-                          actions: [
-                            ...allActions.slice(0, idx),
-                            { value: newValue, name, max, ...rest },
-                            ...allActions.slice(idx + 1),
-                          ],
+                          actions: updateArray(allActions, idx, {
+                            value: newValue,
+                            name,
+                            max,
+                            ...rest,
+                          }),
                         },
                       });
                     }}
@@ -412,7 +488,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
         <Grid name="rules-reference-one" style={{ display: "flex" }}>
           <section>
             <h3>Teamwork</h3>
-            <ul>
+            <ul style={{ ...unstyleList }}>
               <li>
                 Lead a <b>group action</b>
               </li>
@@ -432,7 +508,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             <span>
               Choose a <b>plan</b>. Pick <b>load</b>. Provide <b>detail</b>:
             </span>
-            <ul>
+            <ul style={{ ...unstyleList }}>
               <li>
                 <b>Assault plan:</b> Point of attack.
               </li>
@@ -455,7 +531,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           </section>
           <section>
             <h3>Gather Info</h3>
-            <ul>
+            <ul style={{ ...unstyleList }}>
               <li>What's their intention?</li>
               <li>What might I suspect about this? What can I prove?</li>
               <li>What's the danger here?</li>
@@ -599,6 +675,32 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           { name: "Heavy", min: 0, max: 1, value: 0 },
           { name: "Special", min: 0, max: 1, value: 0 },
         ],
+        harm: [
+          {
+            level: 1,
+            value: 0,
+            max: 2,
+            min: 0,
+            descriptions: [],
+            penalty: "Less effect",
+          },
+          {
+            level: 2,
+            value: 0,
+            max: 2,
+            min: 0,
+            descriptions: [],
+            penalty: "-1D",
+          },
+          {
+            level: 3,
+            value: 0,
+            max: 1,
+            min: 0,
+            descriptions: [],
+            penalty: "Need help",
+          },
+        ] as FitDActorSheetDataData["harm"],
       },
     });
     // I think this is due to a race condition at DB level?
