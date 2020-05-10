@@ -23,16 +23,36 @@ type FitDItems = {
   [K in keyof FitDItemData]: Item & { data: FitDItemData[K] };
 };
 
+type Resource<D extends object = {}> = {
+  min: number;
+  max: number;
+  value: number;
+} & D;
+
 type ASD = ActorSheetData["data"];
 type PC = typeof FITD_TEMPLATE["Actor"]["pc"];
 interface FitDActorSheetDataData extends ASD, PC {
   traumas: string[];
+  details: {
+    alias: string;
+    heritage: string;
+    background: string;
+    vice: string;
+    purveyor: string;
+  };
   xp: Partial<
     Record<
       "insight" | "prowess" | "resist",
       { value: number; max: number; min: number }
     >
   >;
+  actions: Resource<{
+    name: string;
+    attribute: "prowess" | "insight" | "resolve";
+  }>[];
+  armor: Resource<{
+    name: string;
+  }>[];
 }
 
 type FitDActorSheet = ActorSheetData & {
@@ -54,32 +74,24 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
   _renderFSXTemplate({ actor, data }: FitDActorSheet, options): VNode {
     console.log(actor, options);
 
-    const armor: FitDItems["armor"][] = actor.items.filter(
-      ({ type }) => type === "armor"
-    ) as any;
-
     const items: FitDItems["item"][] = actor.items.filter(
       ({ type }) => type === "item"
     ) as any;
     const systemItems = items.filter(
       ({ data: { source } }) => source === "default-system"
     );
-    const actions: FitDItems["action"][] = actor.items.filter(
-      ({ type }) => type === "action"
-    ) as any;
-    const insightActions = actions.filter(
-      ({ data: { attribute } }) => attribute === "insight"
+    console.log(items);
+    const allActions = data?.actions ?? [];
+    const insightActions = allActions.filter(
+      ({ attribute }) => attribute === "insight"
     );
-    const prowessActions = actions.filter(
-      ({ data: { attribute } }) => attribute === "prowess"
+    const prowessActions = allActions.filter(
+      ({ attribute }) => attribute === "prowess"
     );
-    const resolveActions = actions.filter(
-      ({ data: { attribute } }) => attribute === "resolve"
+    const resolveActions = allActions.filter(
+      ({ attribute }) => attribute === "resolve"
     );
-    const otherActions = actions.filter(
-      ({ data: { attribute } }) =>
-        !["insight", "prowess", "resolve"].includes(attribute)
-    );
+
     return (
       <article
         class={{
@@ -99,12 +111,26 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           <div class={{ row: true }}>
             <input
               props={{ placeholder: "Name", value: actor.name, type: "text" }}
+              on={{
+                blur: (ev) =>
+                  this.actor.update({
+                    name: (ev.target as HTMLInputElement).value,
+                  }),
+              }}
             />
             <input
               props={{
                 placeholder: "Alias",
                 type: "text",
-                // value: actor.data.alias
+                value: data.details.alias,
+              }}
+              on={{
+                blur: (ev) =>
+                  this.actor.update({
+                    data: {
+                      details: { alias: (ev.target as HTMLInputElement).value },
+                    },
+                  }),
               }}
             />
           </div>
@@ -113,14 +139,34 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               props={{
                 placeholder: "Heritage",
                 type: "text",
-                // value: actor.data.heritage,
+                value: data.details.heritage,
+              }}
+              on={{
+                blur: (ev) =>
+                  this.actor.update({
+                    data: {
+                      details: {
+                        heritage: (ev.target as HTMLInputElement).value,
+                      },
+                    },
+                  }),
               }}
             />
             <input
               props={{
                 placeholder: "Background",
                 type: "text",
-                // value: actor.data.background,
+                value: data.details.background,
+              }}
+              on={{
+                blur: (ev) =>
+                  this.actor.update({
+                    data: {
+                      details: {
+                        background: (ev.target as HTMLInputElement).value,
+                      },
+                    },
+                  }),
               }}
             />
           </div>
@@ -129,14 +175,32 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               props={{
                 placeholder: "Vice",
                 type: "text",
-                // value: actor.data.vice,
+                value: data.details.vice,
+              }}
+              on={{
+                blur: (ev) =>
+                  this.actor.update({
+                    data: {
+                      details: { vice: (ev.target as HTMLInputElement).value },
+                    },
+                  }),
               }}
             />
             <input
               props={{
                 placeholder: "Purveyor",
                 type: "text",
-                // value: actor.data.purveyor,
+                value: data.details.purveyor,
+              }}
+              on={{
+                blur: (ev) =>
+                  this.actor.update({
+                    data: {
+                      details: {
+                        purveyor: (ev.target as HTMLInputElement).value,
+                      },
+                    },
+                  }),
               }}
             />
           </div>
@@ -185,22 +249,37 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           </div>
           <div>recovery clock</div>
           <div>
-              TODO: move armor into data, instantiation 
-              // CONFIG.debug.hooks = true
+            CONFIG.debug.hooks = true
             <ul>
-              {armor.map(({ _id, name, data: { value, max, min } }) => (
-                <li>
-                  <span>{name}</span>
-                  <SaVRange
-                    value={value}
-                    max={max}
-                    min={min}
-                    set={(value) =>
-                      this.actor.updateOwnedItem({ _id, data: { value } })
-                    }
-                  />
-                </li>
-              ))}
+              {(data?.armor ?? []).map(
+                ({ name, value, max, min, ...rest }, idx, arr) => (
+                  <li>
+                    <span>{name}</span>
+                    <SaVRange
+                      value={value}
+                      max={max}
+                      min={min}
+                      set={(value) =>
+                        this.actor.update({
+                          data: {
+                            armor: [
+                              ...arr.slice(0, idx),
+                              {
+                                name,
+                                max,
+                                min,
+                                value,
+                                ...rest,
+                              },
+                              ...arr.slice(idx + 1),
+                            ],
+                          },
+                        })
+                      }
+                    />
+                  </li>
+                )
+              )}
             </ul>
           </div>
           <div>cred/stash</div>
@@ -222,11 +301,12 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           </textarea>
         </Grid>
         <Grid name="playbook-details">
-          {actions.length === 0 ? (
+          {allActions.length === 0 ? (
             <button
               on={{ click: () => this._instantiateScumAndVillainyCharacter() }}
             >
-              fill in data
+              fill in data (TODO: turn this into a dialog with a playbook
+              dropdown)
             </button>
           ) : (
             <SelectPlaybook
@@ -255,7 +335,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                     // @ts-ignore TODO: global typings
                     const roll = await new FitDRoll(
                       actions.reduce(
-                        (acc, { data: { value } }) => acc + (value > 0 ? 1 : 0),
+                        (acc, { value }) => acc + (value > 0 ? 1 : 0),
                         0
                       )
                     );
@@ -275,7 +355,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                   }
                 />
               </li>
-              {actions.map(({ id, _id, name, data: { value, max } }) => (
+              {actions.map(({ name, value, max, ...rest }) => (
                 <li>
                   <Action
                     name={name}
@@ -288,9 +368,17 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                       roll.toMessage();
                     }}
                     set={(newValue) => {
-                      this.actor.updateOwnedItem({
-                        _id,
-                        data: { value: newValue },
+                      const idx = allActions.findIndex(
+                        ({ name: actionName }) => name === actionName
+                      );
+                      this.actor.update({
+                        data: {
+                          actions: [
+                            ...allActions.slice(0, idx),
+                            { value: newValue, name, max, ...rest },
+                            ...allActions.slice(idx + 1),
+                          ],
+                        },
                       });
                     }}
                   />
@@ -298,15 +386,6 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               ))}
             </ul>
           ))}
-          {otherActions.length > 0 && (
-            <ul class={{ "fitd-actor-sheet-misc": true }}>
-              {otherActions.map(({ name, data: { value, max, min } }) => (
-                <li>
-                  {name}: {value}/{max}
-                </li>
-              ))}
-            </ul>
-          )}
         </Grid>
         <Grid name="items-two">
           <ul>
@@ -330,22 +409,63 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           </ul>
         </Grid>
         <Grid name="contacts-items-one">contacts, items 1</Grid>
-        <Grid name="rules-reference-one">
-          <h3>Teamwork</h3>
-          <ul>
-            <li>
-              Lead a <b>group action</b>
-            </li>
-            <li>
-              <b>Set up</b> another character
-            </li>
-            <li>
-              <b>Protect</b> a teammate
-            </li>
-            <li>
-              <b>Assist</b> another character
-            </li>
-          </ul>
+        <Grid name="rules-reference-one" style={{ display: "flex" }}>
+          <section>
+            <h3>Teamwork</h3>
+            <ul>
+              <li>
+                Lead a <b>group action</b>
+              </li>
+              <li>
+                <b>Set up</b> another character
+              </li>
+              <li>
+                <b>Protect</b> a teammate
+              </li>
+              <li>
+                <b>Assist</b> another character
+              </li>
+            </ul>
+          </section>
+          <section>
+            <h3>Planning & Load</h3>
+            <span>
+              Choose a <b>plan</b>. Pick <b>load</b>. Provide <b>detail</b>:
+            </span>
+            <ul>
+              <li>
+                <b>Assault plan:</b> Point of attack.
+              </li>
+              <li>
+                <b>Deception plan:</b> Method.
+              </li>
+              <li>
+                <b>Infiltration plan:</b> Entry point.
+              </li>
+              <li>
+                <b>Mystic plan:</b> Arcane power.
+              </li>
+              <li>
+                <b>Social plan:</b> Social connection.
+              </li>
+              <li>
+                <b>Transport plan:</b> Route and means.
+              </li>
+            </ul>
+          </section>
+          <section>
+            <h3>Gather Info</h3>
+            <ul>
+              <li>What's their intention?</li>
+              <li>What might I suspect about this? What can I prove?</li>
+              <li>What's the danger here?</li>
+              <li>How can I find _____?</li>
+              <li>What's really going on here?</li>
+              <li>
+                Ask about a <b>detail</b> for a <b>plan</b>.
+              </li>
+            </ul>
+          </section>
         </Grid>
         <Grid name="rules-reference-two">
           Mark XP:
@@ -425,16 +545,16 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
       { name: "prowess", actions: ["helm", "scramble", "scrap", "skulk"] },
       { name: "resolve", actions: ["attune", "command", "consort", "sway"] },
     ].flatMap(({ name: attribute, actions }) => {
-      return actions.map((actionName) => ({
-        name: actionName,
-        type: "action",
-        data: {
-          attribute,
-          value: 0,
-          min: 0,
-          max: 3,
-        } as FitDItems["action"]["data"],
-      }));
+      return actions.map(
+        (actionName) =>
+          ({
+            name: actionName,
+            attribute,
+            value: 0,
+            min: 0,
+            max: 3,
+          } as FitDActorSheetDataData["actions"][0])
+      );
     });
     const systemItems = [
       { name: "Blaster Pistol" },
@@ -461,16 +581,33 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
     await this.actor.update({
       data: {
         system: "scum-and-villainy",
+        details: {
+          alias: "",
+          heritage: "",
+          background: "",
+          vice: "",
+          purveyor: "",
+        },
         xp: {
           insight: { value: 0, min: 0, max: 6 },
           prowess: { value: 0, min: 0, max: 6 },
           resolve: { value: 0, min: 0, max: 6 },
         },
+        actions,
+        armor: [
+          { name: "Armor", min: 0, max: 1, value: 0 },
+          { name: "Heavy", min: 0, max: 1, value: 0 },
+          { name: "Special", min: 0, max: 1, value: 0 },
+        ],
       },
     });
     // I think this is due to a race condition at DB level?
-    for (const item of [...actions, ...systemItems]) {
-      await this.actor.createOwnedItem(item);
+    for (const item of [...systemItems]) {
+      try {
+        await this.actor.createOwnedItem(item);
+      } catch (ex) {
+        console.error(`Error creating: '${item.name}'`, ex);
+      }
     }
     console.log("Instantiated");
   }

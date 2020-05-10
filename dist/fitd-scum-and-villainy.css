@@ -2,3 +2,171 @@
   font-family: "Metro";
   src: url("./fonts/metro.otf") format("otf");
 }
+.fitd.sheet {
+  box-shadow: none;
+  background: none;
+}
+.fitd.sheet section.window-content {
+  background: none;
+}
+
+.fitd-actor-sheet-grid-container {
+  display: grid;
+  grid-template-columns: 3fr 2fr 1fr;
+  gap: 1px 1px;
+  grid-template-areas: "fitd-actor-sheet-logo                      fitd-actor-sheet-playbook-details       fitd-actor-sheet-actions" "fitd-actor-sheet-character-details         fitd-actor-sheet-moves                  fitd-actor-sheet-actions" "fitd-actor-sheet-stress-trauma             fitd-actor-sheet-moves                  fitd-actor-sheet-actions" "fitd-actor-sheet-harm-recovery-armor-stash fitd-actor-sheet-moves                  fitd-actor-sheet-rules-reference-three" "fitd-actor-sheet-notes-projects            fitd-actor-sheet-contacts-items-one     fitd-actor-sheet-items-two" "fitd-actor-sheet-rules-reference-one       fitd-actor-sheet-rules-reference-two    fitd-actor-sheet-items-two";
+}
+
+.fitd-actor-sheet-logo {
+  grid-area: fitd-actor-sheet-logo;
+}
+
+.fitd-actor-sheet-character-details {
+  grid-area: fitd-actor-sheet-character-details;
+}
+
+.fitd-actor-sheet-stress-trauma {
+  grid-area: fitd-actor-sheet-stress-trauma;
+}
+.fitd-actor-sheet-stress-trauma h3 ~ datalist {
+  margin-left: 4px;
+}
+
+.fitd-actor-sheet-harm-recovery-armor-stash {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1px 1px;
+  grid-template-areas: "fitd-actor-sheet-harm fitd-actor-sheet-armor" "fitd-actor-sheet-recovery fitd-actor-sheet-cred-stash";
+  grid-area: fitd-actor-sheet-harm-recovery-armor-stash;
+}
+
+.fitd-actor-sheet-harm {
+  grid-area: fitd-actor-sheet-harm;
+}
+
+.fitd-actor-sheet-recovery {
+  grid-area: fitd-actor-sheet-recovery;
+}
+
+.fitd-actor-sheet-armor {
+  grid-area: fitd-actor-sheet-armor;
+}
+
+.fitd-actor-sheet-cred-stash {
+  grid-area: fitd-actor-sheet-cred-stash;
+}
+
+.fitd-actor-sheet-notes-projects {
+  grid-area: fitd-actor-sheet-notes-projects;
+  display: flex;
+}
+.fitd-actor-sheet-notes-projects textarea {
+  flex-grow: 1;
+}
+
+.fitd-actor-sheet-playbook-details {
+  grid-area: fitd-actor-sheet-playbook-details;
+}
+
+.fitd-actor-sheet-moves {
+  grid-area: fitd-actor-sheet-moves;
+}
+
+.fitd-actor-sheet-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1px 1px;
+  grid-template-areas: "fitd-actor-sheet-insight" "fitd-actor-sheet-prowess" "fitd-actor-sheet-resolve";
+  grid-area: fitd-actor-sheet-actions;
+}
+
+.fitd-actor-sheet-insight {
+  grid-area: fitd-actor-sheet-insight;
+}
+
+.fitd-actor-sheet-prowess {
+  grid-area: fitd-actor-sheet-prowess;
+}
+
+.fitd-actor-sheet-resolve {
+  grid-area: fitd-actor-sheet-resolve;
+}
+
+.fitd-actor-sheet-items-two {
+  grid-area: fitd-actor-sheet-items-two;
+}
+
+.fitd-actor-sheet-contacts-items-one {
+  grid-area: fitd-actor-sheet-contacts-items-one;
+}
+
+.fitd-actor-sheet-rules-reference-one {
+  grid-area: fitd-actor-sheet-rules-reference-one;
+}
+
+.fitd-actor-sheet-rules-reference-two {
+  grid-area: fitd-actor-sheet-rules-reference-two;
+}
+
+.fitd-actor-sheet-rules-reference-three {
+  grid-area: fitd-actor-sheet-rules-reference-three;
+}
+
+.fitd-actor-sheet-trauma-list li {
+  flex-basis: 25%;
+}
+
+.fitd-actor-sheet input[type=range] {
+  display: none;
+  outline: none;
+  -webkit-appearance: none;
+  background-color: #aaa;
+  height: 3px;
+  width: 100%;
+  margin: 10px auto;
+  position: relative;
+}
+.fitd-actor-sheet input[type=range] ::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  border-radius: 50%;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+.fitd-actor-sheet input[type=range] ::-moz-range-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  border-radius: 50%;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+.fitd-actor-sheet input[type=range] ::-ms-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  background-color: green;
+  border-radius: 50%;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+.fitd-actor-sheet datalist {
+  display: flex;
+}
+.fitd-actor-sheet datalist option {
+  width: 10px;
+  height: 10px;
+  background: transparent;
+  transform: skew(-20deg);
+  border: 1px solid black;
+  margin-right: 2px;
+  color: transparent;
+}
+.fitd-actor-sheet datalist option.active {
+  background: black;
+}
