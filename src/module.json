@@ -1,0 +1,12 @@
+{
+  "name": "fitd-scum-and-villainy",
+  "title": "Scum & Villainy",
+  "systems": ["fitd"],
+  "version": "0.1.0",
+  "author": "strass",
+  "esmodules": ["fitd-scum-and-villainy.js"],
+  "styles": ["fitd-scum-and-villainy.css"],
+  "minimumCoreVersion": "0.5.5",
+  "compatibleCoreVersion": "0.5.5",
+  "fonts": ["./fonts/metro.otf"]
+}
