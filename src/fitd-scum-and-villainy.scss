@@ -1,9 +1,24 @@
 @font-face {
   font-family: "Metro";
-  src: url("./fonts/metro.otf") format("otf");
+  src: url(./fonts/metro.otf);
 }
 
-.fitd.sheet {
+@font-face {
+  font-family: "Exo";
+  src: url(./fonts/exo2.ttf) format("truetype");
+  font-weight: 1 999;
+}
+
+.font-family-metro {
+  font-family: Metro;
+}
+.font-family-exo {
+  font-family: Exo;
+}
+
+.fitd.sheet.scum-and-villainy,
+.fitd.dialog.scum-and-villainy {
+  font-family: "Exo";
   box-shadow: none;
   > header {
     background: rgba(10, 118, 143, 0.9);
@@ -29,6 +44,15 @@
         color: white;
       }
     }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: Metro;
   }
 }
 
@@ -129,9 +153,6 @@
 
 .fitd-actor-sheet-rules-reference-one {
   grid-area: fitd-actor-sheet-rules-reference-one;
-  section > *:not(h3) {
-    font-size: 11px;
-  }
 }
 
 .fitd-actor-sheet-rules-reference-two {
@@ -189,6 +210,8 @@
   }
   datalist {
     display: flex;
+  }
+  .fitd-actor-sheet-range {
     option {
       width: 10px;
       height: 1em;
@@ -202,4 +225,10 @@
       }
     }
   }
+  // .fitd-actor-sheet-triangle-range {
+    // datalist {
+      // option {
+      // }
+    // }
+  // }
 }

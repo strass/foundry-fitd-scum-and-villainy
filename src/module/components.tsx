@@ -3,12 +3,63 @@ import { jsx } from "../snabbdom/jsx.js";
 import { VNodeData, VNode } from "../snabbdom/vnode.js";
 import { horizontalList, unstyleList } from "./styles.js";
 
+export const Triangle = (filled: boolean) => (filled ? "►" : "▷");
+
+export const TriangleRange = (
+  {
+    value,
+    min,
+    max,
+    set,
+    fontFamily,
+    style,
+    ...props
+  }: VNodeData & {
+    value: number;
+    min: number;
+    max: number;
+    set: (idx: number) => void;
+  },
+  children?: never
+) => (
+  // TODO: see if Fragment exists?
+  <span
+    {...props}
+    style={mergeObject({ display: "inline-flex" }, style)}
+    class={{ "fitd-actor-sheet-triangle-range": true }}
+  >
+    <input
+      props={{
+        type: "range",
+        name,
+        value,
+        min,
+        max,
+        // list: `${name}-list`,
+      }}
+    />
+    <datalist props={{ id: `${name}-list` }}>
+      {Array(max)
+        .fill(undefined)
+        .map((_, idx) => (
+          <option
+            on={{ click: () => set(idx + 1) }}
+            class={{ active: value >= idx + 1 }}
+          >
+            {Triangle(value >= idx + 1)}
+          </option>
+        ))}
+    </datalist>
+  </span>
+);
+
 export const SaVRange = (
   {
     value,
     min,
     max,
     set,
+    fontFamily,
     ...props
   }: VNodeData & {
     value: number;
@@ -19,7 +70,7 @@ export const SaVRange = (
   children?: Array<VNode | string>
 ) => (
   // TODO: see if Fragment exists?
-  <span {...props}>
+  <span {...props} class={{ "fitd-actor-sheet-range": true }}>
     <input
       props={{
         type: "range",
@@ -27,9 +78,10 @@ export const SaVRange = (
         value,
         min,
         max,
-        // list: `${name}-list`,
       }}
-      class={{ "fitd-actor-sheet-range": true }}
+      attrs={{
+        list: `${name}-list`,
+      }}
     />
     <datalist props={{ id: `${name}-list` }}>
       {Array(max)
@@ -46,7 +98,6 @@ export const SaVRange = (
   </span>
 );
 
-// TODO: combine stress + trauma into generic component
 export const HorizontalTrack = ({
   name,
   value,
@@ -66,7 +117,7 @@ export const HorizontalTrack = ({
     {...props}
     style={mergeObject({ display: "flex", height: "fit-content" }, style)}
   >
-    <h2 style={{ background: "white", color: "black", display: "flex" }}>
+    <h3 style={{ background: "white", color: "black", display: "flex" }}>
       <span>{name}</span>
       <SaVRange
         value={value}
@@ -80,7 +131,7 @@ export const HorizontalTrack = ({
           paddingRight: "6px",
         }}
       />
-    </h2>
+    </h3>
   </div>
 );
 
@@ -125,18 +176,20 @@ export const Traumas = (
           height: "fit-content",
         }}
       >
-        {row.map((traumaName) => (
+        {row.map((traumaName, idx, arr) => (
           <li
             class={{ selected: traumas.includes(traumaName) }}
             style={{
-              fontWeight: traumas.includes(traumaName) ? "bold" : "normal",
+              fontWeight: traumas.includes(traumaName) ? "500" : "300",
               flex: "1 1 25%",
-              height: "fit-content",
+              // Not sure why I need this. For some reason the nbsp's are fucking with line height?
+              height: "14px",
               textAlign: "center",
+              fontVariant: "all-small-caps",
             }}
             on={{ click: () => toggleTrauma(traumaName) }}
           >
-            {traumaName}
+            {`${traumaName}${idx !== arr.length - 1 ? "\u00A0–\u00A0" : ""}`}
           </li>
         ))}
       </ul>
@@ -158,7 +211,13 @@ export const Action = ({
   set: (newValue: number) => void;
 }) => (
   <div class={{ row: true }}>
-    <ol style={{ ...horizontalList, ...unstyleList }}>
+    <ol
+      style={{
+        ...(horizontalList as any),
+        ...(unstyleList as any),
+        alignItems: "center",
+      }}
+    >
       {Array(max)
         .fill(undefined)
         .map((_, idx) => (
@@ -176,12 +235,19 @@ export const Action = ({
           </li>
         ))}
     </ol>
-    <RollButton roll={roll} name={name} />
+    <RollButton fontFamily="Exo" roll={roll} name={name} />
   </div>
 );
 
 export const RollButton = (
-  { roll, name, on, style, ...props }: VNodeData,
+  {
+    roll,
+    name,
+    on,
+    style,
+    fontFamily,
+    ...props
+  }: VNodeData & { name: string; fontFamily?: "Metro" | "Exo" },
   children: never
 ) => (
   <button
@@ -194,11 +260,16 @@ export const RollButton = (
         background: "none",
         textAlign: "left",
         cursor: "pointer",
+        fontFamily: fontFamily,
+        fontVariant: "all-small-caps",
+        fontSize: "20px",
+        fontWeight: "700",
+        lineHeight: "100%",
       },
       style
     )}
   >
-    {name}
+    {name.capitalize()}
   </button>
 );
 
@@ -291,10 +362,4 @@ export const Item = ({
     <SaVRange max={max} value={value} linked={linked} set={set} min={min} />{" "}
     {name}
   </li>
-);
-
-export const TriangleSVGPolygon = () => (
-  <svg width="1em" height="1em" viewBox="0 0 24 24">
-    <polygon points="0,0 24,12 0,24" />
-  </svg>
 );

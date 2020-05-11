@@ -14,9 +14,13 @@ import {
   Item,
   SaVRange,
   RollButton,
+  Triangle,
+  TriangleRange,
 } from "./components.js";
 import { updateArray } from "./util.js";
 import { unstyleList } from "./styles.js";
+import FSXDialog from "./FSXDialog.js";
+import moves from "./moves.js";
 
 interface FitDItemData
   extends Omit<typeof FITD_TEMPLATE["Item"], "types" | "templates"> {}
@@ -67,7 +71,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
   /** @override */
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
-      classes: ["fitd", "sheet", "actor"],
+      classes: ["fitd", "sheet", "actor", "pc", "scum-and-villainy"],
       width: 1200,
       height: 1000,
     });
@@ -307,7 +311,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                 ))}
             </main>
             <footer class={{ row: true }}>
-              <h4>Recovery</h4>
+              <h5>Recovery</h5>
               <span>
                 Get treatment in <b>downtime</b> to fill your{" "}
                 <b>healing clock ></b>
@@ -316,13 +320,14 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             </footer>
           </Grid>
           <Grid name="armor">
-            CONFIG.debug.hooks = true
             <ul>
               {(data?.armor ?? []).map(
                 ({ name, value, max, min, ...rest }, idx, arr) => (
-                  <li>
-                    <span>{name}</span>
+                  <li class={{ row: true }} style={{ ...unstyleList }}>
+                    <h4>{name}</h4>
                     <SaVRange
+                      style={{ marginLeft: "auto" }}
+                      fontFamily="Metro"
                       value={value}
                       max={max}
                       min={min}
@@ -351,7 +356,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           name="notes-projects"
           style={{ display: "flex", flexDirection: "column" }}
         >
-          <h2>Notes/Projects</h2>
+          <h5>Notes/Projects</h5>
           <textarea
             on={{
               blur: (e) =>
@@ -366,7 +371,51 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
         <Grid name="playbook-details">
           {allActions.length === 0 ? (
             <button
-              on={{ click: () => this._instantiateScumAndVillainyCharacter() }}
+              on={{
+                click: () => {
+                  // TODO: this is gross? Do I need to figure out stateful components?
+                  let playbook = "";
+                  new FSXDialog(
+                    {
+                      title: "New Move",
+                      yes: () => console.log("yes"),
+                      no: () => console.log("no"),
+                      content: (dialog, data, options) => {
+                        return (
+                          <div>
+                            <SelectPlaybook
+                              playbook={playbook}
+                              set={(newPlaybook) => (playbook = newPlaybook)}
+                            />
+                            <button
+                              on={{
+                                click: async () => {
+                                  console.log(dialog);
+                                  try {
+                                    await this._instantiateScumAndVillainyCharacter(
+                                      playbook
+                                    );
+                                    dialog.close();
+                                  } catch (ex) {
+                                    console.error(ex);
+                                  }
+                                },
+                              }}
+                            >
+                              Instantiate
+                            </button>
+                          </div>
+                        );
+                      },
+                      buttons: [],
+                    },
+                    {
+                      // TODO: figure out why this isn't working
+                      classes: ["fitd", "scum-and-villainy"],
+                    }
+                  ).render(true);
+                },
+              }}
             >
               fill in data (TODO: turn this into a dialog with a playbook
               dropdown)
@@ -382,16 +431,94 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
         </Grid>
         <Grid name="moves">
           <ul>
-            {moves.map(({ name, data: { value, max } }) => (
-              <li>
-                {Array(max)
-                  .fill(undefined)
-                  .map((_, idx) => (idx >= value ? "x" : "o"))}{" "}
-                {name}
-              </li>
-            ))}
+            {moves.map(
+              ({ _id, name, data: { value, max, description, min } }) => (
+                <li style={{ ...unstyleList }}>
+                  <TriangleRange
+                    name={`move-${name}`}
+                    value={value}
+                    min={min}
+                    max={max}
+                    set={async (newValue) => {
+                      await this.actor.updateOwnedItem({
+                        _id,
+                        data: { value: newValue },
+                      });
+                    }}
+                  />
+                  <b>{name}</b> <span>{description}</span>
+                </li>
+              )
+            )}
           </ul>
-          <button>Add Move</button>
+          <button
+            on={{
+              click: () => {
+                // TODO: this is gross? Do I need to figure out stateful components?
+                const move = {
+                  name: "",
+                  description: "",
+                };
+                new FSXDialog(
+                  {
+                    title: "New Move",
+                    yes: () => console.log("yes"),
+                    no: () => console.log("no"),
+                    content: (dialog, data, options) => {
+                      return (
+                        <div>
+                          <input
+                            props={{ value: move.name }}
+                            on={{
+                              change: (ev) => {
+                                move.name = (ev.target as HTMLInputElement).value;
+                              },
+                            }}
+                          />
+                          <textarea
+                            props={{ value: move.description }}
+                            on={{
+                              change: (ev) => {
+                                move.description = (ev.target as HTMLTextAreaElement).value;
+                              },
+                            }}
+                          >
+                            {move.description}
+                          </textarea>
+                          <button
+                            on={{
+                              click: async () => {
+                                console.log(dialog);
+                                try {
+                                  await this.actor.createOwnedItem({
+                                    type: "move",
+                                    name: move.name,
+                                    data: { description: move.description },
+                                  });
+                                  dialog.close();
+                                } catch (ex) {
+                                  console.error(ex);
+                                }
+                              },
+                            }}
+                          >
+                            Add
+                          </button>
+                        </div>
+                      );
+                    },
+                    buttons: [],
+                  },
+                  {
+                    // TODO: figure out why this isn't working
+                    classes: ["fitd", "scum-and-villainy"],
+                  }
+                ).render(true);
+              },
+            }}
+          >
+            Add Move
+          </button>
         </Grid>
         <Grid name="actions">
           {[
@@ -403,10 +530,10 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               class={{ [`fitd-actor-sheet-${name}`]: true }}
               style={{ listStyle: "none" }}
             >
-              <li class={{ row: true }}>
+              <li class={{ row: true }} style={{ alignItems: "center" }}>
                 <RollButton
+                  fontFamily="Metro"
                   roll={async () => {
-                    console.log(actions);
                     // @ts-ignore TODO: global typings
                     const roll = await new FitDRoll(
                       actions.reduce(
@@ -487,7 +614,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
         <Grid name="contacts-items-one">contacts, items 1</Grid>
         <Grid name="rules-reference-one" style={{ display: "flex" }}>
           <section>
-            <h3>Teamwork</h3>
+            <h4>Teamwork</h4>
             <ul style={{ ...unstyleList }}>
               <li>
                 Lead a <b>group action</b>
@@ -504,7 +631,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             </ul>
           </section>
           <section>
-            <h3>Planning & Load</h3>
+            <h4>Planning & Load</h4>
             <span>
               Choose a <b>plan</b>. Pick <b>load</b>. Provide <b>detail</b>:
             </span>
@@ -530,7 +657,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             </ul>
           </section>
           <section>
-            <h3>Gather Info</h3>
+            <h4>Gather Info</h4>
             <ul style={{ ...unstyleList }}>
               <li>What's their intention?</li>
               <li>What might I suspect about this? What can I prove?</li>
@@ -593,7 +720,6 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
   }
 
   async _renderInner(data: FitDActorSheet, options) {
-    console.log("renderInner");
     if (
       // Check whether we've already created our vnode and reconciled it into the DOM
       this._vnode &&
@@ -615,7 +741,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
     return (this._vnode.elm as unknown) as HTMLElement;
   }
 
-  async _instantiateScumAndVillainyCharacter() {
+  async _instantiateScumAndVillainyCharacter(playbook: string) {
     const actions = [
       { name: "insight", actions: ["doctor", "hack", "rig", "study"] },
       { name: "prowess", actions: ["helm", "scramble", "scrap", "skulk"] },
@@ -703,8 +829,13 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
         ] as FitDActorSheetDataData["harm"],
       },
     });
+    const playbookMoves = (moves![playbook] ?? []).map(({ name, ...data }) => ({
+      type: "move",
+      name,
+      data,
+    }));
     // I think this is due to a race condition at DB level?
-    for (const item of [...systemItems]) {
+    for (const item of [...systemItems, ...playbookMoves]) {
       try {
         await this.actor.createOwnedItem(item);
       } catch (ex) {

@@ -1,30 +1,68 @@
 @font-face {
   font-family: "Metro";
-  src: url("./fonts/metro.otf") format("otf");
+  src: url(./fonts/metro.otf);
 }
-.fitd.sheet {
+@font-face {
+  font-family: "Exo";
+  src: url(./fonts/exo2.ttf) format("truetype");
+  font-weight: 1 999;
+}
+.font-family-metro {
+  font-family: Metro;
+}
+
+.font-family-exo {
+  font-family: Exo;
+}
+
+.fitd.sheet.scum-and-villainy,
+.fitd.dialog.scum-and-villainy {
+  font-family: "Exo";
   box-shadow: none;
 }
-.fitd.sheet > header {
+.fitd.sheet.scum-and-villainy > header,
+.fitd.dialog.scum-and-villainy > header {
   background: rgba(10, 118, 143, 0.9);
 }
-.fitd.sheet > section.window-content {
+.fitd.sheet.scum-and-villainy > section.window-content,
+.fitd.dialog.scum-and-villainy > section.window-content {
   background: none;
   background: rgba(19, 63, 73, 0.75);
   color: white;
 }
-.fitd.sheet > section.window-content button {
+.fitd.sheet.scum-and-villainy > section.window-content button,
+.fitd.dialog.scum-and-villainy > section.window-content button {
   color: white;
 }
-.fitd.sheet > section.window-content input {
+.fitd.sheet.scum-and-villainy > section.window-content input,
+.fitd.dialog.scum-and-villainy > section.window-content input {
   border: none;
   color: white;
   background: rgba(255, 255, 255, 0.1);
   border-bottom: 1px solid white;
   border-radius: 0;
 }
-.fitd.sheet > section.window-content input::placeholder, .fitd.sheet > section.window-content input::-webkit-input-placeholder, .fitd.sheet > section.window-content input:-moz-placeholder, .fitd.sheet > section.window-content input::-moz-placeholder, .fitd.sheet > section.window-content input:-ms-input-placeholder {
+.fitd.sheet.scum-and-villainy > section.window-content input::placeholder, .fitd.sheet.scum-and-villainy > section.window-content input::-webkit-input-placeholder, .fitd.sheet.scum-and-villainy > section.window-content input:-moz-placeholder, .fitd.sheet.scum-and-villainy > section.window-content input::-moz-placeholder, .fitd.sheet.scum-and-villainy > section.window-content input:-ms-input-placeholder,
+.fitd.dialog.scum-and-villainy > section.window-content input::placeholder,
+.fitd.dialog.scum-and-villainy > section.window-content input::-webkit-input-placeholder,
+.fitd.dialog.scum-and-villainy > section.window-content input:-moz-placeholder,
+.fitd.dialog.scum-and-villainy > section.window-content input::-moz-placeholder,
+.fitd.dialog.scum-and-villainy > section.window-content input:-ms-input-placeholder {
   color: white;
+}
+.fitd.sheet.scum-and-villainy h1,
+.fitd.sheet.scum-and-villainy h2,
+.fitd.sheet.scum-and-villainy h3,
+.fitd.sheet.scum-and-villainy h4,
+.fitd.sheet.scum-and-villainy h5,
+.fitd.sheet.scum-and-villainy h6,
+.fitd.dialog.scum-and-villainy h1,
+.fitd.dialog.scum-and-villainy h2,
+.fitd.dialog.scum-and-villainy h3,
+.fitd.dialog.scum-and-villainy h4,
+.fitd.dialog.scum-and-villainy h5,
+.fitd.dialog.scum-and-villainy h6 {
+  font-family: Metro;
 }
 
 .fitd-actor-sheet-grid-container {
@@ -117,9 +155,6 @@
 .fitd-actor-sheet-rules-reference-one {
   grid-area: fitd-actor-sheet-rules-reference-one;
 }
-.fitd-actor-sheet-rules-reference-one section > *:not(h3) {
-  font-size: 11px;
-}
 
 .fitd-actor-sheet-rules-reference-two {
   grid-area: fitd-actor-sheet-rules-reference-two;
@@ -173,7 +208,7 @@
 .fitd-actor-sheet datalist {
   display: flex;
 }
-.fitd-actor-sheet datalist option {
+.fitd-actor-sheet .fitd-actor-sheet-range option {
   width: 10px;
   height: 1em;
   background: transparent;
@@ -182,6 +217,6 @@
   margin-right: 2px;
   color: transparent;
 }
-.fitd-actor-sheet datalist option.active {
+.fitd-actor-sheet .fitd-actor-sheet-range option.active {
   background: white;
 }
