@@ -16,11 +16,15 @@ import {
   RollButton,
   Triangle,
   TriangleRange,
+  Input,
 } from "./components.js";
-import { updateArray } from "./util.js";
+import { updateArray, toggleRange, arrayWithout, arrayWith } from "./util.js";
 import { unstyleList } from "./styles.js";
 import FSXDialog from "./FSXDialog.js";
 import moves from "./moves.js";
+
+// @ts-ignore TODO: replace
+const set = require("lodash").set;
 
 interface FitDItemData
   extends Omit<typeof FITD_TEMPLATE["Item"], "types" | "templates"> {}
@@ -44,7 +48,6 @@ interface FitDActorSheetDataData extends ASD, PC {
     heritage: string;
     background: string;
     vice: string;
-    purveyor: string;
   };
   xp: Partial<
     Record<
@@ -72,10 +75,18 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       classes: ["fitd", "sheet", "actor", "pc", "scum-and-villainy"],
-      width: 1200,
-      height: 1000,
+      width: 1100,
+      height: 750,
     });
   }
+
+  _handleUpdateActorEvent = (path: string) => (
+    event: FocusEvent | InputEvent
+  ) =>
+    this.actor.update(set({}, path, (event.target as HTMLInputElement).value));
+
+  _handleUpdateActorValue = (path: string) => (value: string) =>
+    this.actor.update(set({}, path, value));
 
   // This is where you write your app in JSX.
   _renderFSXTemplate({ actor, data }: FitDActorSheet, options): VNode {
@@ -106,136 +117,94 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
       <article
         class={{
           "fitd-actor-sheet": true,
-          "fitd-actor-sheet-grid-container": true,
+          // "fitd-actor-sheet-grid-container": true,
         }}
+        style={{ display: "flex" }}
       >
-        <Grid name="sheet-logo">
-          <img
-            props={{
-              src:
-                "https://assets0.dostuffmedia.com/uploads/aws_asset/aws_asset/3149708/f7f83b9b-6d63-4817-acee-fd7439cacf9a.jpg",
+        <div style={{ flex: "3 1 auto" }} class={{ column: true }}>
+          <Grid name="sheet-logo">
+            <h1>Scum & Villainy</h1>
+          </Grid>
+          <Grid
+            name="character-details"
+            style={{
+              marginBottom: "18px",
             }}
-          />
-        </Grid>
-        <Grid name="character-details">
-          <div class={{ row: true }}>
-            <input
-              props={{ placeholder: "Name", value: actor.name, type: "text" }}
-              on={{
-                blur: (ev) =>
-                  this.actor.update({
-                    name: (ev.target as HTMLInputElement).value,
-                  }),
-              }}
+          >
+            <div class={{ row: true }}>
+              <Input
+                name="actor.name"
+                label="Name"
+                value={actor.name}
+                onBlur={this._handleUpdateActorEvent("name")}
+                style={{ width: "50%" }}
+              />
+              <Input
+                name="data.details.alias"
+                label="Alias"
+                value={data.details.alias}
+                onBlur={this._handleUpdateActorEvent("data.details.alias")}
+                style={{ width: "50%" }}
+              />
+            </div>
+            <div class={{ row: true }}>
+              <Input
+                name="data.details.heritage"
+                label="Heritage"
+                value={data.details.heritage}
+                onBlur={this._handleUpdateActorEvent("data.details.heritage")}
+                style={{ width: "50%" }}
+              />
+
+              <Input
+                name="data.details.background"
+                label="Background"
+                value={data.details.background}
+                onBlur={this._handleUpdateActorEvent("data.details.background")}
+                style={{ width: "50%" }}
+              />
+            </div>
+            <div class={{ row: true }}>
+              <Input
+                name="data.details.vice"
+                label="Vice/Purveyor"
+                value={data.details.vice}
+                onBlur={this._handleUpdateActorEvent("data.details.vice")}
+                style={{ width: "100%" }}
+              />
+            </div>
+          </Grid>
+          <Grid name="stress-trauma" class={{ row: true }}>
+            <Stress
+              style={{ flex: "0 0 auto", paddingRight: "8px" }}
+              value={data.stress.value}
+              min={data.stress.min}
+              max={data.stress.max}
+              set={(newValue) =>
+                this._handleUpdateActorValue("data.stress.value")(
+                  toggleRange(newValue, data.stress.value)
+                )
+              }
             />
-            <input
-              props={{
-                placeholder: "Alias",
-                type: "text",
-                value: data.details.alias,
-              }}
-              on={{
-                blur: (ev) =>
-                  this.actor.update({
-                    data: {
-                      details: { alias: (ev.target as HTMLInputElement).value },
-                    },
-                  }),
-              }}
-            />
-          </div>
-          <div class={{ row: true }}>
-            <input
-              props={{
-                placeholder: "Heritage",
-                type: "text",
-                value: data.details.heritage,
-              }}
-              on={{
-                blur: (ev) =>
-                  this.actor.update({
-                    data: {
-                      details: {
-                        heritage: (ev.target as HTMLInputElement).value,
-                      },
-                    },
-                  }),
-              }}
-            />
-            <input
-              props={{
-                placeholder: "Background",
-                type: "text",
-                value: data.details.background,
-              }}
-              on={{
-                blur: (ev) =>
-                  this.actor.update({
-                    data: {
-                      details: {
-                        background: (ev.target as HTMLInputElement).value,
-                      },
-                    },
-                  }),
-              }}
-            />
-          </div>
-          <div class={{ row: true }}>
-            <input
-              props={{
-                placeholder: "Vice",
-                type: "text",
-                value: data.details.vice,
-              }}
-              on={{
-                blur: (ev) =>
-                  this.actor.update({
-                    data: {
-                      details: { vice: (ev.target as HTMLInputElement).value },
-                    },
-                  }),
-              }}
-            />
-            <input
-              props={{
-                placeholder: "Purveyor",
-                type: "text",
-                value: data.details.purveyor,
-              }}
-              on={{
-                blur: (ev) =>
-                  this.actor.update({
-                    data: {
-                      details: {
-                        purveyor: (ev.target as HTMLInputElement).value,
-                      },
-                    },
-                  }),
-              }}
-            />
-          </div>
-        </Grid>
-        <Grid name="stress-trauma" class={{ row: true }}>
-          <Stress
-            style={{ flex: "0 0 auto", paddingRight: "8px" }}
-            value={data.stress.value}
-            min={data.stress.min}
-            max={data.stress.max}
-            set={(newValue) =>
-              this.actor.update({ data: { stress: { value: newValue } } })
-            }
-          />
-          <div style={{ flex: "0 0 auto", paddingRight: "8px" }}>
+
             <Trauma
+              style={{ flex: "0 0 auto", paddingRight: "8px" }}
               value={data.trauma.value}
               min={data.trauma.min}
               max={data.trauma.max}
               set={(newValue) =>
-                this.actor.update({ data: { trauma: { value: newValue } } })
+                this.actor.update({
+                  data: {
+                    trauma: {
+                      value: toggleRange(newValue, data.trauma.value),
+                    },
+                  },
+                })
               }
             />
-          </div>
-          <div style={{ flex: "0 0 auto" }}>
+          </Grid>
+          {/** TODO: decide whether I'm still using Grid */}
+          <div>
             <Traumas
               traumas={data.traumas}
               toggleTrauma={(traumaName: string) => {
@@ -245,136 +214,299 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                 traumaIndex > -1
                   ? this.actor.update({
                       data: {
-                        traumas: [
-                          ...data.traumas.slice(0, traumaIndex),
-                          ...data.traumas.slice(traumaIndex + 1),
-                        ],
+                        traumas: arrayWithout(data.traumas, traumaIndex),
                       },
                     })
                   : this.actor.update({
-                      data: { traumas: [...data.traumas, traumaName] },
+                      data: { traumas: arrayWith(data.traumas, traumaName) },
                     });
               }}
             />
           </div>
-        </Grid>
-        <Grid name="harm-armor-stash">
-          <Grid name="harm">
-            <header>
-              <h4>Harm</h4>
-            </header>
-            <main>
-              {data.harm
-                .sort(({ level: levelA }, { level: levelB }) => levelB - levelA)
-                .map(({ level, max, penalty, descriptions, ...rest }, idx) => (
-                  <div
-                    class={{ row: true }}
-                    style={{ width: "100%", height: "36px" }}
-                  >
-                    <label style={{ flex: "0 0 12px" }}>{level}</label>
-                    {Array(max)
-                      .fill(undefined)
-                      .map((_, jdx) => (
-                        <input
-                          style={{
-                            flex: "1 1 auto",
-                            width: "100%",
-                            borderLeft:
-                              jdx !== 0 ? "1px solid white" : undefined,
-                          }}
-                          props={{
-                            value: descriptions![jdx] ?? "",
-                          }}
-                          on={{
-                            blur: (ev) =>
-                              this.actor.update({
-                                data: {
-                                  harm: updateArray(data.harm, idx, {
-                                    level,
-                                    max,
-                                    penalty,
-                                    descriptions: updateArray(
-                                      descriptions,
-                                      jdx,
-                                      (ev.target as HTMLInputElement).value
-                                    ),
-                                    ...rest,
-                                    value: descriptions.filter(Boolean).length,
+          <Grid name="harm-armor-stash">
+            <Grid name="harm">
+              <header>
+                <h4>Harm</h4>
+              </header>
+              <main>
+                {data.harm
+                  .sort(
+                    ({ level: levelA }, { level: levelB }) => levelB - levelA
+                  )
+                  .map(
+                    ({ level, max, penalty, descriptions, ...rest }, idx) => (
+                      <div
+                        class={{ row: true }}
+                        style={{ width: "100%", height: "36px" }}
+                      >
+                        <label style={{ flex: "0 0 12px" }}>{level}</label>
+                        {Array(max)
+                          .fill(undefined)
+                          .map((_, jdx) => (
+                            <input
+                              style={{
+                                flex: "1 1 auto",
+                                width: "100%",
+                                borderLeft:
+                                  jdx !== 0 ? "1px solid white" : undefined,
+                              }}
+                              props={{
+                                value: descriptions![jdx] ?? "",
+                              }}
+                              on={{
+                                blur: (ev) =>
+                                  this.actor.update({
+                                    data: {
+                                      harm: updateArray(data.harm, idx, {
+                                        level,
+                                        max,
+                                        penalty,
+                                        descriptions: updateArray(
+                                          descriptions,
+                                          jdx,
+                                          (ev.target as HTMLInputElement).value
+                                        ),
+                                        ...rest,
+                                        value: descriptions.filter(Boolean)
+                                          .length,
+                                      }),
+                                    },
                                   }),
-                                },
+                              }}
+                            />
+                          ))}
+                        <label style={{ flex: "0 0 75px" }}>{penalty}</label>
+                      </div>
+                    )
+                  )}
+              </main>
+              <footer class={{ row: true }}>
+                <h5>Recovery</h5>
+                <span>
+                  Get treatment in <b>downtime</b> to fill your{" "}
+                  <b>healing clock ></b>
+                </span>
+                <span>CLOCK</span>
+              </footer>
+            </Grid>
+            <Grid name="armor">
+              <ul>
+                {(data?.armor ?? []).map(
+                  ({ name, value, max, min, ...rest }, idx, arr) => (
+                    <li class={{ row: true }} style={{ ...unstyleList }}>
+                      <h4>{name}</h4>
+                      <SaVRange
+                        style={{ marginLeft: "auto" }}
+                        fontFamily="Metro"
+                        value={value}
+                        max={max}
+                        min={min}
+                        set={(newValue) =>
+                          this.actor.update({
+                            data: {
+                              armor: updateArray(arr, idx, {
+                                name,
+                                max,
+                                min,
+                                value: toggleRange(newValue, value),
+                                ...rest,
                               }),
-                          }}
-                        />
-                      ))}
-                    <label style={{ flex: "0 0 75px" }}>{penalty}</label>
-                  </div>
-                ))}
-            </main>
-            <footer class={{ row: true }}>
-              <h5>Recovery</h5>
-              <span>
-                Get treatment in <b>downtime</b> to fill your{" "}
-                <b>healing clock ></b>
-              </span>
-              <span>CLOCK</span>
-            </footer>
+                            },
+                          })
+                        }
+                      />
+                    </li>
+                  )
+                )}
+              </ul>
+            </Grid>
+            <Grid name="cred-stash">cred/stash</Grid>
           </Grid>
-          <Grid name="armor">
-            <ul>
-              {(data?.armor ?? []).map(
-                ({ name, value, max, min, ...rest }, idx, arr) => (
-                  <li class={{ row: true }} style={{ ...unstyleList }}>
-                    <h4>{name}</h4>
-                    <SaVRange
-                      style={{ marginLeft: "auto" }}
-                      fontFamily="Metro"
-                      value={value}
-                      max={max}
-                      min={min}
-                      set={(value) =>
-                        this.actor.update({
-                          data: {
-                            armor: updateArray(arr, idx, {
-                              name,
-                              max,
-                              min,
-                              value,
-                              ...rest,
-                            }),
-                          },
-                        })
+          <Grid
+            name="notes-projects"
+            style={{ display: "flex", flexDirection: "column" }}
+          >
+            <h5>Notes/Projects</h5>
+            <textarea
+              on={{
+                blur: (e) =>
+                  this.actor.update({
+                    data: { notes: (e.target as HTMLTextAreaElement).value },
+                  }),
+              }}
+            >
+              {data.notes}
+            </textarea>
+          </Grid>
+          <Grid name="rules-reference-one" style={{ display: "none" }}>
+            <section style={{ flex: "1 1 auto" }}>
+              <h5>Teamwork</h5>
+              <ul style={{ ...unstyleList }}>
+                <li>
+                  Lead a <b>group action</b>
+                </li>
+                <li>
+                  <b>Set up</b> another character
+                </li>
+                <li>
+                  <b>Protect</b> a teammate
+                </li>
+                <li>
+                  <b>Assist</b> another character
+                </li>
+              </ul>
+            </section>
+            <section style={{ flex: "1 1 auto" }}>
+              <h5>Planning & Load</h5>
+              <span>
+                Choose a <b>plan</b>. Pick <b>load</b>. Provide <b>detail</b>:
+              </span>
+              <ul style={{ ...unstyleList }}>
+                <li>
+                  <b>Assault plan:</b> Point of attack.
+                </li>
+                <li>
+                  <b>Deception plan:</b> Method.
+                </li>
+                <li>
+                  <b>Infiltration plan:</b> Entry point.
+                </li>
+                <li>
+                  <b>Mystic plan:</b> Arcane power.
+                </li>
+                <li>
+                  <b>Social plan:</b> Social connection.
+                </li>
+                <li>
+                  <b>Transport plan:</b> Route and means.
+                </li>
+              </ul>
+            </section>
+            <section style={{ flex: "1 1 auto" }}>
+              <h5>Gather Info</h5>
+              <ul style={{ ...unstyleList }}>
+                <li>What's their intention?</li>
+                <li>What might I suspect about this? What can I prove?</li>
+                <li>What's the danger here?</li>
+                <li>How can I find _____?</li>
+                <li>What's really going on here?</li>
+                <li>
+                  Ask about a <b>detail</b> for a <b>plan</b>.
+                </li>
+              </ul>
+            </section>
+          </Grid>
+        </div>
+        <div style={{ flex: "2 1 auto" }} class={{ column: true }}>
+          <Grid name="playbook-details">
+            {allActions.length === 0 ? (
+              <button
+                on={{
+                  click: () => {
+                    // TODO: this is gross? Do I need to figure out stateful components?
+                    let playbook = "";
+                    new FSXDialog(
+                      {
+                        title: "New Move",
+                        yes: () => console.log("yes"),
+                        no: () => console.log("no"),
+                        content: (dialog, data, options) => {
+                          return (
+                            <div>
+                              <SelectPlaybook
+                                playbook={playbook}
+                                set={(newPlaybook) => (playbook = newPlaybook)}
+                              />
+                              <button
+                                on={{
+                                  click: async () => {
+                                    console.log(dialog);
+                                    try {
+                                      await this._instantiateScumAndVillainyCharacter(
+                                        playbook
+                                      );
+                                      dialog.close();
+                                    } catch (ex) {
+                                      console.error(ex);
+                                    }
+                                  },
+                                }}
+                              >
+                                Instantiate
+                              </button>
+                            </div>
+                          );
+                        },
+                        buttons: [],
+                      },
+                      {
+                        // TODO: figure out why this isn't working
+                        classes: ["fitd", "scum-and-villainy"],
                       }
+                    ).render(true);
+                  },
+                }}
+              >
+                fill in data (TODO: turn this into a dialog with a playbook
+                dropdown)
+              </button>
+            ) : (
+              <SelectPlaybook
+                playbook={data.playbook}
+                set={(playbook) =>
+                  this.actor.update({ data: { playbook } } as FitDActorSheet)
+                }
+              />
+            )}
+          </Grid>
+          <Grid name="moves">
+            <ul style={{ ...unstyleList }}>
+              {moves.map(
+                ({ _id, name, data: { value, max, description, min } }) => (
+                  <li style={{ ...(unstyleList as any), display: "flex" }}>
+                    <TriangleRange
+                      style={{ flex: "0 0 auto" }}
+                      name={`move-${name}`}
+                      value={value}
+                      min={min}
+                      max={max}
+                      set={async (newValue) => {
+                        await this.actor.updateOwnedItem({
+                          _id,
+                          data: { value: toggleRange(newValue, value) },
+                        });
+                      }}
                     />
+                    <span style={{ flex: "1 1 auto" }}>
+                      <b>{name}:</b> <span>{description}</span>
+                    </span>
+                    <button
+                      style={{
+                        marginLeft: "auto",
+                        height: "30px",
+                        width: "30px",
+                        padding: "0px",
+                        flex: "0 0 auto",
+                      }}
+                      on={{
+                        click: async () =>
+                          await this.actor.deleteOwnedItem(_id),
+                      }}
+                    >
+                      <i class={{ fas: true, "fa-trash": true }} />
+                    </button>
                   </li>
                 )
               )}
             </ul>
-          </Grid>
-          <Grid name="cred-stash">cred/stash</Grid>
-        </Grid>
-        <Grid
-          name="notes-projects"
-          style={{ display: "flex", flexDirection: "column" }}
-        >
-          <h5>Notes/Projects</h5>
-          <textarea
-            on={{
-              blur: (e) =>
-                this.actor.update({
-                  data: { notes: (e.target as HTMLTextAreaElement).value },
-                }),
-            }}
-          >
-            {data.notes}
-          </textarea>
-        </Grid>
-        <Grid name="playbook-details">
-          {allActions.length === 0 ? (
             <button
               on={{
                 click: () => {
                   // TODO: this is gross? Do I need to figure out stateful components?
-                  let playbook = "";
+                  const move = {
+                    name: "",
+                    description: "",
+                  };
                   new FSXDialog(
                     {
                       title: "New Move",
@@ -383,18 +515,34 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                       content: (dialog, data, options) => {
                         return (
                           <div>
-                            <SelectPlaybook
-                              playbook={playbook}
-                              set={(newPlaybook) => (playbook = newPlaybook)}
+                            <input
+                              props={{ value: move.name }}
+                              on={{
+                                change: (ev) => {
+                                  move.name = (ev.target as HTMLInputElement).value;
+                                },
+                              }}
                             />
+                            <textarea
+                              props={{ value: move.description }}
+                              on={{
+                                change: (ev) => {
+                                  move.description = (ev.target as HTMLTextAreaElement).value;
+                                },
+                              }}
+                            >
+                              {move.description}
+                            </textarea>
                             <button
                               on={{
                                 click: async () => {
                                   console.log(dialog);
                                   try {
-                                    await this._instantiateScumAndVillainyCharacter(
-                                      playbook
-                                    );
+                                    await this.actor.createOwnedItem({
+                                      type: "move",
+                                      name: move.name,
+                                      data: { description: move.description },
+                                    });
                                     dialog.close();
                                   } catch (ex) {
                                     console.error(ex);
@@ -402,7 +550,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                                 },
                               }}
                             >
-                              Instantiate
+                              Add
                             </button>
                           </div>
                         );
@@ -417,304 +565,161 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                 },
               }}
             >
-              fill in data (TODO: turn this into a dialog with a playbook
-              dropdown)
+              Add Move
             </button>
-          ) : (
-            <SelectPlaybook
-              playbook={data.playbook}
-              set={(playbook) =>
-                this.actor.update({ data: { playbook } } as FitDActorSheet)
-              }
-            />
-          )}
-        </Grid>
-        <Grid name="moves">
-          <ul>
-            {moves.map(
-              ({ _id, name, data: { value, max, description, min } }) => (
-                <li style={{ ...unstyleList }}>
-                  <TriangleRange
-                    name={`move-${name}`}
-                    value={value}
-                    min={min}
-                    max={max}
-                    set={async (newValue) => {
-                      await this.actor.updateOwnedItem({
-                        _id,
-                        data: { value: newValue },
-                      });
-                    }}
-                  />
-                  <b>{name}</b> <span>{description}</span>
-                </li>
-              )
-            )}
-          </ul>
-          <button
-            on={{
-              click: () => {
-                // TODO: this is gross? Do I need to figure out stateful components?
-                const move = {
-                  name: "",
-                  description: "",
-                };
-                new FSXDialog(
-                  {
-                    title: "New Move",
-                    yes: () => console.log("yes"),
-                    no: () => console.log("no"),
-                    content: (dialog, data, options) => {
-                      return (
-                        <div>
-                          <input
-                            props={{ value: move.name }}
-                            on={{
-                              change: (ev) => {
-                                move.name = (ev.target as HTMLInputElement).value;
-                              },
-                            }}
-                          />
-                          <textarea
-                            props={{ value: move.description }}
-                            on={{
-                              change: (ev) => {
-                                move.description = (ev.target as HTMLTextAreaElement).value;
-                              },
-                            }}
-                          >
-                            {move.description}
-                          </textarea>
-                          <button
-                            on={{
-                              click: async () => {
-                                console.log(dialog);
-                                try {
-                                  await this.actor.createOwnedItem({
-                                    type: "move",
-                                    name: move.name,
-                                    data: { description: move.description },
-                                  });
-                                  dialog.close();
-                                } catch (ex) {
-                                  console.error(ex);
-                                }
-                              },
-                            }}
-                          >
-                            Add
-                          </button>
-                        </div>
-                      );
-                    },
-                    buttons: [],
-                  },
-                  {
-                    // TODO: figure out why this isn't working
-                    classes: ["fitd", "scum-and-villainy"],
-                  }
-                ).render(true);
-              },
-            }}
-          >
-            Add Move
-          </button>
-        </Grid>
-        <Grid name="actions">
-          {[
-            { name: "insight", actions: insightActions },
-            { name: "prowess", actions: prowessActions },
-            { name: "resolve", actions: resolveActions },
-          ].map(({ name, actions }) => (
-            <ul
-              class={{ [`fitd-actor-sheet-${name}`]: true }}
-              style={{ listStyle: "none" }}
-            >
-              <li class={{ row: true }} style={{ alignItems: "center" }}>
-                <RollButton
-                  fontFamily="Metro"
-                  roll={async () => {
-                    // @ts-ignore TODO: global typings
-                    const roll = await new FitDRoll(
-                      actions.reduce(
-                        (acc, { value }) => acc + (value > 0 ? 1 : 0),
-                        0
-                      )
-                    );
-                    console.log(roll);
-                    await roll.toMessage();
-                  }}
-                  name={name}
-                />
-                <SaVRange
-                  value={data.xp![name]?.value ?? 0}
-                  min={data.xp![name]?.min ?? 0}
-                  max={data.xp![name]?.max ?? 0}
-                  set={(newValue) =>
-                    this.actor.update({
-                      data: { xp: { [name]: { value: newValue } } },
-                    })
-                  }
-                />
+          </Grid>
+          <Grid name="contacts-items-one">contacts, items 1</Grid>
+          <Grid name="rules-reference-two" style={{ display: "none" }}>
+            Mark XP:
+            <ul>
+              <li>
+                Every time you roll a desparate action, mark xp in that action's
+                attribute.
               </li>
-              {actions.map(({ name, value, max, ...rest }) => (
-                <li>
-                  <Action
+            </ul>
+            At the end of each session, for each item below, mark 1 xp (in your
+            playbook or an attribute) or 2xp if that item occurred multiple
+            times.
+            <ul>
+              <li>You addressed a tough challenge with ___</li>
+              <li>
+                You expressed your beliefs, drives, heritage, or background.
+              </li>
+              <li>
+                You struggled with issues from your vice or traumas during the
+                session.
+              </li>
+            </ul>
+          </Grid>
+        </div>
+        <div style={{ flex: "1 1 auto" }} class={{ column: true }}>
+          <Grid name="actions">
+            {[
+              { name: "insight", actions: insightActions },
+              { name: "prowess", actions: prowessActions },
+              { name: "resolve", actions: resolveActions },
+            ].map(({ name, actions }) => (
+              <ul
+                class={{ [`fitd-actor-sheet-${name}`]: true }}
+                style={{ listStyle: "none" }}
+              >
+                <li class={{ row: true }} style={{ alignItems: "center" }}>
+                  <RollButton
+                    fontFamily="Metro"
+                    roll={async () => {
+                      // @ts-ignore TODO: global typings
+                      const roll = FitDRoll(
+                        actions.reduce(
+                          (acc, { value }) => acc + (value > 0 ? 1 : 0),
+                          0
+                        ),
+                        { type: "fortune" }
+                      );
+                      console.log(roll);
+                      const message = await roll.toMessage();
+                      console.log(message);
+                    }}
+                    name={name}
+                  />
+                  <SaVRange
+                    value={data.xp![name]?.value ?? 0}
+                    min={data.xp![name]?.min ?? 0}
+                    max={data.xp![name]?.max ?? 0}
+                    set={(newValue) =>
+                      this.actor.update({
+                        data: {
+                          xp: {
+                            [name]: {
+                              value: toggleRange(
+                                newValue,
+                                data.xp![name]?.value ?? 0
+                              ),
+                            },
+                          },
+                        },
+                      })
+                    }
+                  />
+                </li>
+                {actions.map(({ name, value, max, ...rest }) => (
+                  <li>
+                    <Action
+                      name={name}
+                      value={value}
+                      max={max}
+                      roll={() => {
+                        // @ts-ignore TODO: make global declarations
+                        const roll = FitDRoll(value, { action: name });
+                        console.log(roll);
+                        roll.toMessage();
+                      }}
+                      set={(newValue) => {
+                        const idx = allActions.findIndex(
+                          ({ name: actionName }) => name === actionName
+                        );
+                        this.actor.update({
+                          data: {
+                            actions: updateArray(allActions, idx, {
+                              value: newValue,
+                              name,
+                              max,
+                              ...rest,
+                            }),
+                          },
+                        });
+                      }}
+                    />
+                  </li>
+                ))}
+              </ul>
+            ))}
+          </Grid>
+          <Grid name="items-two">
+            <ul>
+              {systemItems.map(
+                ({ _id, name, data: { value, max, linked, min } }) => (
+                  <Item
                     name={name}
                     value={value}
                     max={max}
-                    roll={() => {
-                      // @ts-ignore TODO: make global declarations
-                      const roll = new FitDRoll(value);
-                      console.log(roll);
-                      roll.toMessage();
-                    }}
-                    set={(newValue) => {
-                      const idx = allActions.findIndex(
-                        ({ name: actionName }) => name === actionName
-                      );
-                      this.actor.update({
-                        data: {
-                          actions: updateArray(allActions, idx, {
-                            value: newValue,
-                            name,
-                            max,
-                            ...rest,
-                          }),
-                        },
-                      });
-                    }}
+                    linked={linked}
+                    set={(newValue: number) =>
+                      this.actor.updateOwnedItem({
+                        _id,
+                        data: { value: toggleRange(newValue, value) },
+                      })
+                    }
+                    min={min}
                   />
-                </li>
-              ))}
+                )
+              )}
             </ul>
-          ))}
-        </Grid>
-        <Grid name="items-two">
-          <ul>
-            {systemItems.map(
-              ({ _id, name, data: { value, max, linked, min } }) => (
-                <Item
-                  name={name}
-                  value={value}
-                  max={max}
-                  linked={linked}
-                  set={(newValue: number) =>
-                    this.actor.updateOwnedItem({
-                      _id,
-                      data: { value: newValue },
-                    })
-                  }
-                  min={min}
-                />
-              )
-            )}
-          </ul>
-        </Grid>
-        <Grid name="contacts-items-one">contacts, items 1</Grid>
-        <Grid name="rules-reference-one" style={{ display: "flex" }}>
-          <section>
-            <h4>Teamwork</h4>
-            <ul style={{ ...unstyleList }}>
+          </Grid>
+          <Grid name="rules-reference-three" style={{ display: "none" }}>
+            <h3>Bonus Dice</h3>
+            <ul>
               <li>
-                Lead a <b>group action</b>
+                <b class={{ smallcaps: true }}>Push yourself</b> (take 2 stress){" "}
+                <b class={{ smallcaps: true }}>-or-</b> accept a{" "}
+                <b class={{ smallcaps: true }}>devil's bargain</b>.
               </li>
               <li>
-                <b>Set up</b> another character
+                <b class={{ smallcaps: true }}>Assist</b> (they take 1 stress)
               </li>
               <li>
-                <b>Protect</b> a teammate
-              </li>
-              <li>
-                <b>Assist</b> another character
+                <b class={{ smallcaps: true }}>Spend a gambit</b>
               </li>
             </ul>
-          </section>
-          <section>
-            <h4>Planning & Load</h4>
-            <span>
-              Choose a <b>plan</b>. Pick <b>load</b>. Provide <b>detail</b>:
-            </span>
-            <ul style={{ ...unstyleList }}>
+            <h3>Gambits</h3>
+            <ul>
               <li>
-                <b>Assault plan:</b> Point of attack.
-              </li>
-              <li>
-                <b>Deception plan:</b> Method.
-              </li>
-              <li>
-                <b>Infiltration plan:</b> Entry point.
-              </li>
-              <li>
-                <b>Mystic plan:</b> Arcane power.
-              </li>
-              <li>
-                <b>Social plan:</b> Social connection.
-              </li>
-              <li>
-                <b>Transport plan:</b> Route and means.
+                Add a <b>gambit</b> to your crew when you roll a <b>6</b> or{" "}
+                <b>critical</b> on a <b>risky</b> action and you didn't{" "}
+                <b>spend a gambit</b> on a bonus dice.
               </li>
             </ul>
-          </section>
-          <section>
-            <h4>Gather Info</h4>
-            <ul style={{ ...unstyleList }}>
-              <li>What's their intention?</li>
-              <li>What might I suspect about this? What can I prove?</li>
-              <li>What's the danger here?</li>
-              <li>How can I find _____?</li>
-              <li>What's really going on here?</li>
-              <li>
-                Ask about a <b>detail</b> for a <b>plan</b>.
-              </li>
-            </ul>
-          </section>
-        </Grid>
-        <Grid name="rules-reference-two">
-          Mark XP:
-          <ul>
-            <li>
-              Every time you roll a desparate action, mark xp in that action's
-              attribute.
-            </li>
-          </ul>
-          At the end of each session, for each item below, mark 1 xp (in your
-          playbook or an attribute) or 2xp if that item occurred multiple times.
-          <ul>
-            <li>You addressed a tough challenge with ___</li>
-            <li>
-              You expressed your beliefs, drives, heritage, or background.
-            </li>
-            <li>
-              You struggled with issues from your vice or traumas during the
-              session.
-            </li>
-          </ul>
-        </Grid>
-        <Grid name="rules-reference-three">
-          <h3>Bonus Dice</h3>
-          <ul>
-            <li>
-              <b class={{ smallcaps: true }}>Push yourself</b> (take 2 stress){" "}
-              <b class={{ smallcaps: true }}>-or-</b> accept a{" "}
-              <b class={{ smallcaps: true }}>devil's bargain</b>.
-            </li>
-            <li>
-              <b class={{ smallcaps: true }}>Assist</b> (they take 1 stress)
-            </li>
-            <li>
-              <b class={{ smallcaps: true }}>Spend a gambit</b>
-            </li>
-          </ul>
-          <h3>Gambits</h3>
-          <ul>
-            <li>
-              Add a <b>gambit</b> to your crew when you roll a <b>6</b> or{" "}
-              <b>critical</b> on a <b>risky</b> action and you didn't{" "}
-              <b>spend a gambit</b> on a bonus dice.
-            </li>
-          </ul>
-        </Grid>
+          </Grid>
+        </div>
       </article>
     );
   }
@@ -788,7 +793,6 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           heritage: "",
           background: "",
           vice: "",
-          purveyor: "",
         },
         xp: {
           insight: { value: 0, min: 0, max: 6 },

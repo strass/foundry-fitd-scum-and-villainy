@@ -59,6 +59,7 @@ export const SaVRange = (
     min,
     max,
     set,
+    style,
     fontFamily,
     ...props
   }: VNodeData & {
@@ -70,7 +71,17 @@ export const SaVRange = (
   children?: Array<VNode | string>
 ) => (
   // TODO: see if Fragment exists?
-  <span {...props} class={{ "fitd-actor-sheet-range": true }}>
+  <span
+    {...props}
+    style={mergeObject(
+      {
+        display: "flex",
+        alignItems: "center",
+      },
+      style
+    )}
+    class={{ "fitd-actor-sheet-range": true }}
+  >
     <input
       props={{
         type: "range",
@@ -113,26 +124,38 @@ export const HorizontalTrack = ({
   max: number;
   set: (idx: number) => void;
 }) => (
-  <div
+  <h3
     {...props}
-    style={mergeObject({ display: "flex", height: "fit-content" }, style)}
+    style={mergeObject(
+      {
+        color: "white",
+        display: "flex",
+        height: "fit-content",
+        marginBottom: "8px",
+      },
+      style
+    )}
   >
-    <h3 style={{ background: "white", color: "black", display: "flex" }}>
-      <span>{name}</span>
-      <SaVRange
-        value={value}
-        set={set}
-        min={min}
-        max={max}
-        style={{
-          background: "black",
-          marginLeft: "4px",
-          paddingLeft: "6px",
-          paddingRight: "6px",
-        }}
-      />
-    </h3>
-  </div>
+    <span
+      style={{
+        background: "var(--blue02)",
+        padding: "2px",
+        paddingRight: "12px",
+      }}
+    >
+      {name}
+    </span>
+    <SaVRange
+      value={value}
+      set={set}
+      min={min}
+      max={max}
+      style={{
+        marginLeft: "-4px",
+        marginRight: "4px",
+      }}
+    />
+  </h3>
 );
 
 export const Stress = (
@@ -165,8 +188,10 @@ export const Traumas = (
 ) => (
   <div>
     {[
-      ["cold", "haunted", "obsessed", "paranoid"],
-      ["reckless", "soft", "unstable", "vicious"],
+      [
+        ...["cold", "haunted", "obsessed", "paranoid"],
+        ...["reckless", "soft", "unstable", "vicious"],
+      ],
     ].map((row) => (
       <ul
         style={{
@@ -363,3 +388,48 @@ export const Item = ({
     {name}
   </li>
 );
+
+export const Input = ({
+  label,
+  name,
+  type = "text",
+  props,
+  value,
+  onBlur,
+  on,
+  style,
+}: VNodeData &
+  Record<"name" | "value", string> &
+  Partial<Record<"placeholder" | "label", string>> & {
+    type?: "text";
+    onBlur: (e: FocusEvent) => void;
+  }): VNode => {
+  return (
+    <div style={style}>
+      <input
+        props={{
+          ...props,
+          type,
+          value,
+          name,
+        }}
+        on={{
+          ...on,
+          blur: onBlur,
+        }}
+      />
+      <label
+        style={{
+          fontVariant: "all-small-caps",
+          fontWeight: "800",
+          fontSize: "11px",
+          display: "block",
+          marginTop: "-2px",
+          marginBottom: "2px",
+        }}
+      >
+        {label}
+      </label>
+    </div>
+  );
+};

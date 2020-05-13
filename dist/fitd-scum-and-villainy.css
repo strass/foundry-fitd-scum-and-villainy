@@ -17,17 +17,19 @@
 
 .fitd.sheet.scum-and-villainy,
 .fitd.dialog.scum-and-villainy {
+  --blue01: #002f3f;
+  --blue02: #284e5b;
   font-family: "Exo";
   box-shadow: none;
 }
 .fitd.sheet.scum-and-villainy > header,
 .fitd.dialog.scum-and-villainy > header {
-  background: rgba(10, 118, 143, 0.9);
+  background: #284e5b;
 }
 .fitd.sheet.scum-and-villainy > section.window-content,
 .fitd.dialog.scum-and-villainy > section.window-content {
-  background: none;
-  background: rgba(19, 63, 73, 0.75);
+  padding: 0;
+  background: #002f3f;
   color: white;
 }
 .fitd.sheet.scum-and-villainy > section.window-content button,
@@ -38,8 +40,8 @@
 .fitd.dialog.scum-and-villainy > section.window-content input {
   border: none;
   color: white;
-  background: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid white;
+  background: rgba(255, 255, 255, 0.075);
+  border-bottom: 2px solid #284e5b;
   border-radius: 0;
 }
 .fitd.sheet.scum-and-villainy > section.window-content input::placeholder, .fitd.sheet.scum-and-villainy > section.window-content input::-webkit-input-placeholder, .fitd.sheet.scum-and-villainy > section.window-content input:-moz-placeholder, .fitd.sheet.scum-and-villainy > section.window-content input::-moz-placeholder, .fitd.sheet.scum-and-villainy > section.window-content input:-ms-input-placeholder,
@@ -63,6 +65,10 @@
 .fitd.dialog.scum-and-villainy h5,
 .fitd.dialog.scum-and-villainy h6 {
   font-family: Metro;
+}
+
+.fitd-actor-sheet .column:nth-child(2) {
+  background: #284e5b;
 }
 
 .fitd-actor-sheet-grid-container {
@@ -155,6 +161,9 @@
 .fitd-actor-sheet-rules-reference-one {
   grid-area: fitd-actor-sheet-rules-reference-one;
 }
+.fitd-actor-sheet-rules-reference-one section > *:not(h5) {
+  font-size: 10px;
+}
 
 .fitd-actor-sheet-rules-reference-two {
   grid-area: fitd-actor-sheet-rules-reference-two;
@@ -210,8 +219,8 @@
 }
 .fitd-actor-sheet .fitd-actor-sheet-range option {
   width: 10px;
-  height: 1em;
-  background: transparent;
+  height: 100%;
+  background: #002f3f;
   transform: skew(-20deg);
   border: 1px solid white;
   margin-right: 2px;

@@ -1,3 +1,6 @@
+$blue01: rgb(0, 47, 63);
+$blue02: rgb(40, 78, 91);
+
 @font-face {
   font-family: "Metro";
   src: url(./fonts/metro.otf);
@@ -18,14 +21,16 @@
 
 .fitd.sheet.scum-and-villainy,
 .fitd.dialog.scum-and-villainy {
+  --blue01: #{$blue01};
+  --blue02: #{$blue02};
   font-family: "Exo";
   box-shadow: none;
   > header {
-    background: rgba(10, 118, 143, 0.9);
+    background: $blue02;
   }
   > section.window-content {
-    background: none;
-    background: rgba(19, 63, 73, 0.75);
+    padding: 0;
+    background: $blue01;
     color: white;
     button {
       color: white;
@@ -33,8 +38,8 @@
     input {
       border: none;
       color: white;
-      background: rgba(255, 255, 255, 0.1);
-      border-bottom: 1px solid white;
+      background: rgba(255, 255, 255, 0.075);
+      border-bottom: 2px solid $blue02;
       border-radius: 0;
       &::placeholder,
       &::-webkit-input-placeholder,
@@ -56,8 +61,15 @@
   }
 }
 
+.fitd-actor-sheet {
+  .column:nth-child(2) {
+    background: $blue02;
+  }
+}
+
+// Currently this class is disabled
 .fitd-actor-sheet-grid-container {
-  display: grid;
+  display: grid; // Turned off for now
   grid-template-columns: 3fr 2fr 1fr;
   // grid-template-rows: repeat(6, 1fr);
   gap: 1px 1px;
@@ -153,6 +165,9 @@
 
 .fitd-actor-sheet-rules-reference-one {
   grid-area: fitd-actor-sheet-rules-reference-one;
+  section > *:not(h5) {
+    font-size: 10px;
+  }
 }
 
 .fitd-actor-sheet-rules-reference-two {
@@ -214,8 +229,8 @@
   .fitd-actor-sheet-range {
     option {
       width: 10px;
-      height: 1em;
-      background: transparent;
+      height: 100%;
+      background: $blue01;
       transform: skew(-20deg);
       border: 1px solid white;
       margin-right: 2px;
@@ -226,9 +241,9 @@
     }
   }
   // .fitd-actor-sheet-triangle-range {
-    // datalist {
-      // option {
-      // }
-    // }
+  // datalist {
+  // option {
+  // }
+  // }
   // }
 }
