@@ -312,40 +312,24 @@ export const Action = ({
   max,
   roll,
   set,
+  min,
 }: {
   name: string;
   value: number;
   max: number;
+  min: number;
   roll: () => void;
   set: (newValue: number) => void;
 }) => (
   <div class={{ row: true }}>
-    <ol
-      class={{
-        [unstyleList]: true,
-        [horizontalList]: true,
-      }}
-      style={{
-        alignItems: "center",
-      }}
-    >
-      {Array(max)
-        .fill(undefined)
-        .map((_, idx) => (
-          <li
-            on={{ click: () => set(value === idx + 1 ? idx : idx + 1) }}
-            style={{
-              width: "1em",
-              height: "100%",
-              borderRight: idx === 0 ? "1px solid white" : undefined,
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            {value >= idx + 1 ? "►" : "▷"}
-          </li>
-        ))}
-    </ol>
+    <SaVRange
+      element="triangle"
+      value={value}
+      name={name}
+      min={min}
+      max={max}
+      set={set}
+    />
     <RollButton fontFamily="Exo" roll={roll} name={name} />
   </div>
 );

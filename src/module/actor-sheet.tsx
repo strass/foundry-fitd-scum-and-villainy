@@ -72,6 +72,7 @@ type FitDActorSheet = ActorSheetData & {
   data: FitDActorSheetDataData;
 };
 
+// TODO: this should probably be moved out of injectGlobal
 injectGlobal({
   ".fitd.sheet.actor.pc.scum-and-villainy": {
     h1: {
@@ -101,8 +102,6 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
 
   // This is where you write your app in JSX.
   _renderFSXTemplate({ actor, data }: FitDActorSheet, options): VNode {
-    console.log(actor, options);
-
     const moves: FitDItems["move"][] = actor.items.filter(
       ({ type }) => type === "move"
     ) as any;
@@ -112,7 +111,6 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
     const systemItems = items.filter(
       ({ data: { source } }) => source === "default-system"
     );
-    console.log(items);
     const allActions = data?.actions ?? [];
     const insightActions = allActions.filter(
       ({ attribute }) => attribute === "insight"

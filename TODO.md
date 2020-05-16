@@ -24,3 +24,4 @@
 
 - [ ] double click on move opens it up as an item?
 - [ ] improve fsx dialog
+- [ ] move all the css from scss into the file
