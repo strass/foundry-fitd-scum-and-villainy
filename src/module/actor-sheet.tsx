@@ -21,12 +21,7 @@ import { updateArray, toggleRange, arrayWithout, arrayWith } from "./util";
 import FSXDialog from "./FSXDialog";
 import moves from "./moves";
 import { css } from "emotion";
-import {
-  smallCaps,
-  bold,
-  flexRow,
-  unstyleList,
-} from "../style";
+import { smallCaps, bold, flexRow, unstyleList, horizontalList } from "../style";
 import set from "lodash.set";
 
 interface FitDItemData
@@ -358,15 +353,15 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               </footer>
             </Grid>
             <Grid name="armor">
-              <ul style={{ ...unstyleList }}>
+              <ul class={{ [unstyleList]: true }}>
                 {(data?.armor ?? []).map(
                   ({ name, value, max, min, ...rest }, idx, arr) => (
                     <li
                       class={{
                         row: true,
+                        [unstyleList]: true,
                       }}
                       style={{
-                        ...(unstyleList as any),
                         height: "20px",
                         marginBottom: "6px",
                       }}
@@ -442,7 +437,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           <Grid name="rules-reference-one" style={{ display: "none" }}>
             <section style={{ flex: "1 1 auto" }}>
               <h5>Teamwork</h5>
-              <ul style={{ ...unstyleList }}>
+              <ul class={{ [unstyleList]: true }}>
                 <li>
                   Lead a <b>group action</b>
                 </li>
@@ -462,7 +457,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               <span>
                 Choose a <b>plan</b>. Pick <b>load</b>. Provide <b>detail</b>:
               </span>
-              <ul style={{ ...unstyleList }}>
+              <ul class={{ [unstyleList]: true }}>
                 <li>
                   <b>Assault plan:</b> Point of attack.
                 </li>
@@ -485,7 +480,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             </section>
             <section style={{ flex: "1 1 auto" }}>
               <h5>Gather Info</h5>
-              <ul style={{ ...unstyleList }}>
+              <ul class={{ [unstyleList]: true }}>
                 <li>What's their intention?</li>
                 <li>What might I suspect about this? What can I prove?</li>
                 <li>What's the danger here?</li>
@@ -561,10 +556,15 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             )}
           </Grid>
           <Grid name="moves">
-            <ul style={{ ...unstyleList }}>
+            <ul class={{ [unstyleList]: true }}>
               {moves.map(
                 ({ _id, name, data: { value, max, description, min } }) => (
-                  <li style={{ ...(unstyleList as any), display: "flex" }}>
+                  <li
+                    class={{
+                      [unstyleList]: true,
+                      [horizontalList]: true,
+                    }}
+                  >
                     <TriangleRange
                       style={{ flex: "0 0 auto" }}
                       name={`move-${name}`}

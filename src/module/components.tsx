@@ -227,10 +227,12 @@ export const Traumas = ({
     ].map((row) => (
       <ul
         style={{
-          ...(horizontalList as any),
-          ...(unstyleList as any),
           flexWrap: "no-wrap",
           height: "fit-content",
+        }}
+        class={{
+          [unstyleList]: true,
+          [horizontalList]: true,
         }}
       >
         {row.flatMap((traumaName, idx, arr) => [
@@ -278,9 +280,11 @@ export const Action = ({
 }) => (
   <div class={{ row: true }}>
     <ol
+      class={{
+        [unstyleList]: true,
+        [horizontalList]: true,
+      }}
       style={{
-        ...(horizontalList as any),
-        ...(unstyleList as any),
         alignItems: "center",
       }}
     >
