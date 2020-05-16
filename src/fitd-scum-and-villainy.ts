@@ -1,8 +1,8 @@
-import * as snabbdom from "./snabbdom/snabbdom.js";
-import classMod from "./snabbdom/modules/class.js";
-import propsMod from "./snabbdom/modules/props.js";
-import styleMod from "./snabbdom/modules/style.js";
-import eventlistenersMod from "./snabbdom/modules/eventlisteners.js";
+import * as snabbdom from "./snabbdom/snabbdom";
+import classMod from "./snabbdom/modules/class";
+import propsMod from "./snabbdom/modules/props";
+import styleMod from "./snabbdom/modules/style";
+import eventlistenersMod from "./snabbdom/modules/eventlisteners";
 
 const patch = snabbdom.init([
   // Init patch function with chosen modules
@@ -14,4 +14,4 @@ const patch = snabbdom.init([
 
 export default patch;
 
-import "./module/actor-sheet.js";
+import "./module/actor-sheet";

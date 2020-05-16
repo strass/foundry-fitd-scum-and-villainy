@@ -12,6 +12,13 @@ $blue02: rgb(40, 78, 91);
   font-weight: 1 999;
 }
 
+@font-face {
+  font-family: "Exo";
+  src: url(./fonts/exo2-italic.ttf) format("truetype");
+  font-weight: 1 999;
+  font-style: oblique 0deg 12deg italic;
+}
+
 .font-family-metro {
   font-family: Metro;
 }
@@ -23,6 +30,9 @@ $blue02: rgb(40, 78, 91);
 .fitd.dialog.scum-and-villainy {
   --blue01: #{$blue01};
   --blue02: #{$blue02};
+  * {
+    box-sizing: border-box;
+  }
   font-family: "Exo";
   box-shadow: none;
   > header {

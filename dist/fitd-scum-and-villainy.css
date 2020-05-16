@@ -7,6 +7,12 @@
   src: url(./fonts/exo2.ttf) format("truetype");
   font-weight: 1 999;
 }
+@font-face {
+  font-family: "Exo";
+  src: url(./fonts/exo2-italic.ttf) format("truetype");
+  font-weight: 1 999;
+  font-style: oblique 0deg 12deg italic;
+}
 .font-family-metro {
   font-family: Metro;
 }
@@ -21,6 +27,10 @@
   --blue02: #284e5b;
   font-family: "Exo";
   box-shadow: none;
+}
+.fitd.sheet.scum-and-villainy *,
+.fitd.dialog.scum-and-villainy * {
+  box-sizing: border-box;
 }
 .fitd.sheet.scum-and-villainy > header,
 .fitd.dialog.scum-and-villainy > header {

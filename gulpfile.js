@@ -136,6 +136,7 @@ const tsConfig = ts.createProject("tsconfig.json", {
  * Build TypeScript
  */
 function buildTS() {
+  return Promise.resolve();
   return gulp
     .src(["src/**/*.ts", "src/**/*.tsx"])
     .pipe(tsConfig())

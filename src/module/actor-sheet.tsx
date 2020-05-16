@@ -1,10 +1,10 @@
 /** @jsx jsx */
-import { jsx } from "../snabbdom/jsx.js";
-import type { VNode } from "../snabbdom/vnode.js";
-import toVNode from "../snabbdom/tovnode.js";
+import { jsx } from "../snabbdom/jsx";
+import type { VNode } from "../snabbdom/vnode";
+import toVNode from "../snabbdom/tovnode";
 import patch from "../fitd-scum-and-villainy";
 import type FITD_TEMPLATE from "../../../fitd/src/template.json";
-import Grid from "./Grid.js";
+import Grid from "./Grid";
 import {
   Stress,
   Trauma,
@@ -14,14 +14,15 @@ import {
   Item,
   SaVRange,
   RollButton,
-  Triangle,
   TriangleRange,
   Input,
-} from "./components.js";
-import { updateArray, toggleRange, arrayWithout, arrayWith } from "./util.js";
-import { unstyleList } from "./styles.js";
-import FSXDialog from "./FSXDialog.js";
-import moves from "./moves.js";
+} from "./components";
+import { updateArray, toggleRange, arrayWithout, arrayWith } from "./util";
+import { unstyleList } from "./styles";
+import FSXDialog from "./FSXDialog";
+import moves from "./moves";
+import { css } from "emotion";
+import { smallCaps, bold, flexRow } from "../style";
 
 // @ts-ignore TODO: replace
 const set = require("lodash").set;
@@ -176,7 +177,11 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           </Grid>
           <Grid name="stress-trauma" class={{ row: true }}>
             <Stress
-              style={{ flex: "0 0 auto", paddingRight: "8px" }}
+              class={{
+                [css({
+                  "--fill": "var(--blue02)",
+                })]: true,
+              }}
               value={data.stress.value}
               min={data.stress.min}
               max={data.stress.max}
@@ -188,7 +193,16 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             />
 
             <Trauma
-              style={{ flex: "0 0 auto", paddingRight: "8px" }}
+              class={{
+                [css({
+                  "--fill": "grey",
+                  marginLeft: -7.5,
+                  marginRight: 7.5,
+                  span: {
+                    paddingLeft: "10px !important",
+                  },
+                })]: true,
+              }}
               value={data.trauma.value}
               min={data.trauma.min}
               max={data.trauma.max}
@@ -204,7 +218,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             />
           </Grid>
           {/** TODO: decide whether I'm still using Grid */}
-          <div>
+          <div style={{ marginBottom: "12px" }}>
             <Traumas
               traumas={data.traumas}
               toggleTrauma={(traumaName: string) => {
@@ -226,7 +240,19 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
           <Grid name="harm-armor-stash">
             <Grid name="harm">
               <header>
-                <h4>Harm</h4>
+                <h5
+                  class={{
+                    [css({
+                      margin: 0,
+                      paddingTop: 2,
+                      paddingBottom: 2,
+                      marginBottom: 4,
+                      background: "var(--blue02)",
+                    })]: true,
+                  }}
+                >
+                  Harm
+                </h5>
               </header>
               <main>
                 {data.harm
@@ -239,7 +265,19 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                         class={{ row: true }}
                         style={{ width: "100%", height: "36px" }}
                       >
-                        <label style={{ flex: "0 0 12px" }}>{level}</label>
+                        <label
+                          style={{
+                            flex: "0 0 12px",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            paddingLeft: "4px",
+                            fontWeight: "700",
+                            paddingRight: "4px",
+                          }}
+                        >
+                          {level}
+                        </label>
                         {Array(max)
                           .fill(undefined)
                           .map((_, jdx) => (
@@ -275,26 +313,74 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                               }}
                             />
                           ))}
-                        <label style={{ flex: "0 0 75px" }}>{penalty}</label>
+                        <label
+                          class={{
+                            [css({
+                              flex: "0 0 44px",
+                              display: "flex",
+                              fontVariant: "all-small-caps",
+                              fontWeight: 700,
+                              alignContent: "center",
+                              justifyContent: "center",
+                              textAlign: "center",
+                            })]: true,
+                          }}
+                        >
+                          {penalty}
+                        </label>
                       </div>
                     )
                   )}
               </main>
-              <footer class={{ row: true }}>
-                <h5>Recovery</h5>
-                <span>
-                  Get treatment in <b>downtime</b> to fill your{" "}
-                  <b>healing clock ></b>
-                </span>
+              <footer
+                class={{
+                  row: true,
+                }}
+              >
+                <label
+                  class={{
+                    row: true,
+                    [css({
+                      background: "var(--blue02)",
+                    })]: true,
+                  }}
+                >
+                  <h6
+                    style={{ margin: "0" }}
+                    title="Get treatment in downtime to fill your healing clock"
+                  >
+                    Recovery
+                  </h6>
+                </label>
                 <span>CLOCK</span>
               </footer>
             </Grid>
             <Grid name="armor">
-              <ul>
+              <ul style={{ ...unstyleList }}>
                 {(data?.armor ?? []).map(
                   ({ name, value, max, min, ...rest }, idx, arr) => (
-                    <li class={{ row: true }} style={{ ...unstyleList }}>
-                      <h4>{name}</h4>
+                    <li
+                      class={{
+                        row: true,
+                      }}
+                      style={{
+                        ...(unstyleList as any),
+                        height: "20px",
+                        marginBottom: "6px",
+                      }}
+                    >
+                      <h6
+                        style={{
+                          background: "var(--blue02)",
+                          padding: "4px",
+                          margin: "0px",
+                          display: "flex",
+                          alignItems: "center",
+                          flexGrow: "1",
+                        }}
+                      >
+                        {name}
+                      </h6>
                       <SaVRange
                         style={{ marginLeft: "auto" }}
                         fontFamily="Metro"
@@ -320,7 +406,20 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                 )}
               </ul>
             </Grid>
-            <Grid name="cred-stash">cred/stash</Grid>
+            <Grid name="cred-stash">
+              <div class={{ [flexRow]: true }}>
+                <span class={{ [smallCaps]: true, [bold]: true }}>cred:</span>
+                <span>{data.cred.value}</span>
+                <span>/</span>
+                <span>{data.cred.max}</span>
+              </div>
+              <div class={{ [flexRow]: true }}>
+                <span class={{ [smallCaps]: true, [bold]: true }}>stash:</span>
+                <span>{data.stash.value}</span>
+                <span>/</span>
+                <span>{data.stash.max}</span>
+              </div>
+            </Grid>
           </Grid>
           <Grid
             name="notes-projects"

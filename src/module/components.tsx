@@ -1,7 +1,8 @@
 /** @jsx jsx */
-import { jsx } from "../snabbdom/jsx.js";
-import { VNodeData, VNode } from "../snabbdom/vnode.js";
-import { horizontalList, unstyleList } from "./styles.js";
+import { jsx } from "../snabbdom/jsx";
+import { VNodeData, VNode } from "../snabbdom/vnode";
+import { horizontalList, unstyleList } from "./styles";
+import { css } from "emotion";
 
 export const Triangle = (filled: boolean) => (filled ? "►" : "▷");
 
@@ -61,10 +62,12 @@ export const SaVRange = (
     set,
     style,
     fontFamily,
+    fancy,
     ...props
   }: VNodeData & {
     value: number;
     min: number;
+    fancy?: boolean;
     max: number;
     set: (idx: number) => void;
   },
@@ -94,7 +97,20 @@ export const SaVRange = (
         list: `${name}-list`,
       }}
     />
-    <datalist props={{ id: `${name}-list` }}>
+    <datalist
+      props={{ id: `${name}-list` }}
+      class={{
+        [css({
+          "::after": {
+            display: "block",
+            content: "''",
+            width: 20,
+            background: "var(--fill)",
+            marginLeft: -7.5,
+          },
+        })]: fancy,
+      }}
+    >
       {Array(max)
         .fill(undefined)
         .map((_, idx) => (
@@ -115,45 +131,72 @@ export const HorizontalTrack = ({
   set,
   min,
   max,
-  style,
+  class: classes,
+  fancy = false,
   ...props
 }: VNodeData & {
   name: string;
   value: number;
   min: number;
   max: number;
+  fancy?: boolean;
   set: (idx: number) => void;
 }) => (
   <h3
     {...props}
-    style={mergeObject(
-      {
+    class={{
+      ...classes,
+      [css({
+        flex: "0 0 auto",
+        position: "relative",
         color: "white",
         display: "flex",
         height: "fit-content",
         marginBottom: "8px",
-      },
-      style
-    )}
+        ...(fancy
+          ? {
+              "::after": {
+                display: "block",
+                content: "''",
+                position: "absolute",
+                right: 0,
+                borderTop: "12.5px solid transparent",
+                borderBottom: "12.5px solid transparent",
+                borderLeft: "7.5px solid var(--fill)",
+                zIndex: 1,
+              },
+            }
+          : {}),
+      })]: true,
+    }}
   >
-    <span
-      style={{
-        background: "var(--blue02)",
-        padding: "2px",
-        paddingRight: "12px",
-      }}
-    >
-      {name}
-    </span>
+    {fancy && (
+      <span
+        class={{
+          [css({
+            background: "var(--fill)",
+            padding: 2,
+            paddingRight: 24,
+          })]: true,
+        }}
+      >
+        {name}
+      </span>
+    )}
     <SaVRange
       value={value}
+      fancy={fancy}
       set={set}
       min={min}
       max={max}
-      style={{
-        marginLeft: "-4px",
-        marginRight: "4px",
-      }}
+      style={
+        fancy
+          ? {
+              marginLeft: "-15px",
+              marginRight: "7.5px",
+            }
+          : {}
+      }
     />
   </h3>
 );
@@ -165,7 +208,7 @@ export const Stress = (
     max: number;
     set: (idx: number) => void;
   }
-) => <HorizontalTrack {...props} name="Stress" />;
+) => <HorizontalTrack {...props} name="Stress" fancy />;
 
 export const Trauma = (
   props: VNodeData & {
@@ -174,7 +217,7 @@ export const Trauma = (
     max: number;
     set: (idx: number) => void;
   }
-) => <HorizontalTrack {...props} name="Trauma" />;
+) => <HorizontalTrack {...props} name="Trauma" fancy />;
 
 export const Traumas = (
   {
@@ -201,22 +244,31 @@ export const Traumas = (
           height: "fit-content",
         }}
       >
-        {row.map((traumaName, idx, arr) => (
+        {row.flatMap((traumaName, idx, arr) => [
           <li
-            class={{ selected: traumas.includes(traumaName) }}
-            style={{
-              fontWeight: traumas.includes(traumaName) ? "500" : "300",
-              flex: "1 1 25%",
-              // Not sure why I need this. For some reason the nbsp's are fucking with line height?
-              height: "14px",
-              textAlign: "center",
-              fontVariant: "all-small-caps",
+            class={{
+              selected: traumas.includes(traumaName),
+              [css({
+                fontWeight: traumas.includes(traumaName) ? 800 : 200,
+                flex: "1 1 auto",
+                // Not sure why I need this. For some reason the nbsp's are fucking with line height?
+                height: "14px",
+                textAlign: "center",
+                fontVariant: "all-small-caps",
+                ":not(:first-child)": {
+                  paddingLeft: "2px",
+                },
+                ":not(:last-child)": {
+                  paddingRight: "2px",
+                },
+              })]: true,
             }}
             on={{ click: () => toggleTrauma(traumaName) }}
           >
-            {`${traumaName}${idx !== arr.length - 1 ? "\u00A0–\u00A0" : ""}`}
-          </li>
-        ))}
+            {traumaName}
+          </li>,
+          ...(idx !== arr.length - 1 ? [<li>–</li>] : []),
+        ])}
       </ul>
     ))}
   </div>

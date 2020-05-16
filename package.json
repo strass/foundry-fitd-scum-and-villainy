@@ -8,13 +8,15 @@
     "build": "gulp build && gulp link",
     "build:watch": "gulp watch",
     "clean": "gulp clean && gulp link --clean",
-    "update": "npm install --save-dev gitlab:foundry-projects/foundry-pc/foundry-pc-types"
+    "update": "npm install --save-dev gitlab:foundry-projects/foundry-pc/foundry-pc-types",
+    "esbuild": "esbuild src/fitd-scum-and-villainy.ts --bundle --define:global=window '--define:process.env.NODE_ENV=\"development\"' --jsx-factory=jsx --outfile=dist/fitd-scum-and-villainy.js"
   },
   "author": "",
   "license": "",
   "devDependencies": {
     "archiver": "^4.0.1",
     "chalk": "^4.0.0",
+    "esbuild": "^0.3.0",
     "foundry-pc-types": "gitlab:foundry-projects/foundry-pc/foundry-pc-types",
     "fs-extra": "^9.0.0",
     "gulp": "^4.0.2",
