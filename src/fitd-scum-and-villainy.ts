@@ -1,8 +1,8 @@
-import * as snabbdom from "./snabbdom/snabbdom";
-import classMod from "./snabbdom/modules/class";
-import propsMod from "./snabbdom/modules/props";
-import styleMod from "./snabbdom/modules/style";
-import eventlistenersMod from "./snabbdom/modules/eventlisteners";
+import * as snabbdom from "snabbdom/snabbdom";
+import classMod from "snabbdom/modules/class";
+import propsMod from "snabbdom/modules/props";
+import styleMod from "snabbdom/modules/style";
+import eventlistenersMod from "snabbdom/modules/eventlisteners";
 
 const patch = snabbdom.init([
   // Init patch function with chosen modules
