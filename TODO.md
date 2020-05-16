@@ -12,13 +12,20 @@
     - [ ] finish square
   - [ ] clock component
     - [ ] svgs
+  - [ ] cred/stash
 - [ ] load
 - [ ] roll helper
   - [ ] figure out how to pass position/effect/roll type through roll
   - [ ] nice roll render template
 - [ ] data entry
+  - [x] playbook moves
   - [ ] playbook items
   - [ ] playbook contacts
+- [ ] error on close actor-sheet
+- [ ] polish traumas list
+- [ ] click on armor + have it toggle (component?)
+- [ ] polish harm
+- [ ] nicer playbook list
 
 # LATER
 

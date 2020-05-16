@@ -1,11 +1,17 @@
 /** @jsx jsx */
-
 import { jsx, Fragment } from "snabbdom-jsx-lite";
 import type { VNodeData, VNode } from "snabbdom/vnode";
 import { css } from "emotion";
 import { horizontalList, unstyleList } from "../style";
 
-export const Triangle = (filled: boolean) => (filled ? "►" : "▷");
+export const Triangle = (filled: boolean) => {
+  // return (
+  //   <svg attrs={{}}>
+  //     <path attrs={{ d: "m 0 0 h 4 l -2 -3 z" }} attrs-path="test" />
+  //   </svg>
+  // );
+  return filled ? "►" : "▷";
+};
 export const Square = (filled: boolean) => (filled ? "■" : "□");
 export const Parallelogram = (filled: boolean) => (filled ? "▰" : "▱");
 
