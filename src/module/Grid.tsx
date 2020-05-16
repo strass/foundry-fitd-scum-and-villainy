@@ -1,6 +1,6 @@
 /** @jsx jsx */
-import { jsx } from "../snabbdom/jsx.js";
-import { VNodeData } from "../snabbdom/vnode";
+import { jsx } from "snabbdom-jsx-lite";
+import type { VNodeData } from "snabbdom/vnode";
 
 export default (
   { class: className, name, ...props }: VNodeData & { name: string },

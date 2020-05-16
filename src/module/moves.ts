@@ -1,8 +1,3 @@
-const generic = {
-  name: "",
-  description: "",
-};
-
 const veteran = {
   name: "Veteran",
   description: "Choose a special ability from another",

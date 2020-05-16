@@ -1,7 +1,7 @@
 /** @jsx jsx */
-import { jsx } from "../snabbdom/jsx";
-import type { VNode } from "../snabbdom/vnode";
-import toVNode from "../snabbdom/tovnode";
+import { jsx } from "snabbdom-jsx-lite";
+import type { VNode } from "snabbdom/vnode";
+import toVNode from "snabbdom/tovnode";
 import patch from "../fitd-scum-and-villainy";
 import type FITD_TEMPLATE from "../../../fitd/src/template.json";
 import Grid from "./Grid";
@@ -18,14 +18,16 @@ import {
   Input,
 } from "./components";
 import { updateArray, toggleRange, arrayWithout, arrayWith } from "./util";
-import { unstyleList } from "./styles";
 import FSXDialog from "./FSXDialog";
 import moves from "./moves";
 import { css } from "emotion";
-import { smallCaps, bold, flexRow } from "../style";
-
-// @ts-ignore TODO: replace
-const set = require("lodash").set;
+import {
+  smallCaps,
+  bold,
+  flexRow,
+  unstyleList,
+} from "../style";
+import set from "lodash.set";
 
 interface FitDItemData
   extends Omit<typeof FITD_TEMPLATE["Item"], "types" | "templates"> {}

@@ -4,6 +4,8 @@ import propsMod from "snabbdom/modules/props";
 import styleMod from "snabbdom/modules/style";
 import eventlistenersMod from "snabbdom/modules/eventlisteners";
 
+import "./module/actor-sheet";
+
 const patch = snabbdom.init([
   // Init patch function with chosen modules
   classMod, // makes it easy to toggle classes
@@ -13,5 +15,3 @@ const patch = snabbdom.init([
 ]);
 
 export default patch;
-
-import "./module/actor-sheet";

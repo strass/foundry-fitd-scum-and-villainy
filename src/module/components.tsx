@@ -1,28 +1,24 @@
 /** @jsx jsx */
-import { jsx } from "../snabbdom/jsx";
-import { VNodeData, VNode } from "../snabbdom/vnode";
-import { horizontalList, unstyleList } from "./styles";
+import { jsx } from "snabbdom-jsx-lite";
+import { VNodeData, VNode } from "snabbdom/vnode";
 import { css } from "emotion";
+import { horizontalList, unstyleList } from "../style";
 
 export const Triangle = (filled: boolean) => (filled ? "►" : "▷");
 
-export const TriangleRange = (
-  {
-    value,
-    min,
-    max,
-    set,
-    fontFamily,
-    style,
-    ...props
-  }: VNodeData & {
-    value: number;
-    min: number;
-    max: number;
-    set: (idx: number) => void;
-  },
-  children?: never
-) => (
+export const TriangleRange = ({
+  value,
+  min,
+  max,
+  set,
+  style,
+  ...props
+}: VNodeData & {
+  value: number;
+  min: number;
+  max: number;
+  set: (idx: number) => void;
+}) => (
   // TODO: see if Fragment exists?
   <span
     {...props}
@@ -54,25 +50,21 @@ export const TriangleRange = (
   </span>
 );
 
-export const SaVRange = (
-  {
-    value,
-    min,
-    max,
-    set,
-    style,
-    fontFamily,
-    fancy,
-    ...props
-  }: VNodeData & {
-    value: number;
-    min: number;
-    fancy?: boolean;
-    max: number;
-    set: (idx: number) => void;
-  },
-  children?: Array<VNode | string>
-) => (
+export const SaVRange = ({
+  value,
+  min,
+  max,
+  set,
+  style,
+  fancy,
+  ...props
+}: VNodeData & {
+  value: number;
+  min: number;
+  fancy?: boolean;
+  max: number;
+  set: (idx: number) => void;
+}) => (
   // TODO: see if Fragment exists?
   <span
     {...props}
@@ -219,16 +211,13 @@ export const Trauma = (
   }
 ) => <HorizontalTrack {...props} name="Trauma" fancy />;
 
-export const Traumas = (
-  {
-    traumas,
-    toggleTrauma,
-  }: {
-    traumas: string[];
-    toggleTrauma: (traumaName: string) => void;
-  },
-  children: never
-) => (
+export const Traumas = ({
+  traumas,
+  toggleTrauma,
+}: {
+  traumas: string[];
+  toggleTrauma: (traumaName: string) => void;
+}) => (
   <div>
     {[
       [
@@ -316,17 +305,14 @@ export const Action = ({
   </div>
 );
 
-export const RollButton = (
-  {
-    roll,
-    name,
-    on,
-    style,
-    fontFamily,
-    ...props
-  }: VNodeData & { name: string; fontFamily?: "Metro" | "Exo" },
-  children: never
-) => (
+export const RollButton = ({
+  roll,
+  name,
+  on,
+  style,
+  fontFamily,
+  ...props
+}: VNodeData & { name: string; fontFamily?: "Metro" | "Exo" }) => (
   <button
     {...props}
     on={mergeObject({ click: roll }, on)}
@@ -393,30 +379,6 @@ export const SelectPlaybook = ({
     </div>
   );
 };
-
-const ItemBoxes = ({
-  value,
-  set,
-  min,
-  max,
-  linked,
-  ...props
-}: VNodeData & {
-  value: number;
-  set: () => void;
-  min: number;
-  max: number;
-  linked: boolean;
-}) => (
-  <SaVRange
-    {...props}
-    value={value}
-    set={set}
-    min={min}
-    max={max}
-    linked={linked}
-  />
-);
 
 export const Item = ({
   name,
