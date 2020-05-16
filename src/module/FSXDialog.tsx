@@ -1,6 +1,8 @@
+/** @jsx jsx */
+// import { jsx } from "snabbdom-jsx-lite";
 import type { VNode } from "snabbdom/vnode";
-import toVNode from "snabbdom/tovnode";
 import patch from "../fitd-scum-and-villainy";
+import toVNode from "snabbdom/tovnode";
 
 interface FSXDialogData extends Omit<ConfirmDialog, "content"> {
   content: (dialog: FSXDialog, data, options) => VNode;
@@ -21,7 +23,7 @@ export default class FSXDialog extends Dialog {
       template: undefined,
     });
   }
-  
+
   activateListeners() {}
 
   _renderFSXTemplate(data, options) {

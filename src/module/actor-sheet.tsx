@@ -14,14 +14,19 @@ import {
   Item,
   SaVRange,
   RollButton,
-  TriangleRange,
   Input,
 } from "./components";
 import { updateArray, toggleRange, arrayWithout, arrayWith } from "./util";
 import FSXDialog from "./FSXDialog";
 import moves from "./moves";
-import { css } from "emotion";
-import { smallCaps, bold, flexRow, unstyleList, horizontalList } from "../style";
+import { css, injectGlobal } from "emotion";
+import {
+  smallCaps,
+  bold,
+  flexRow,
+  unstyleList,
+  horizontalList,
+} from "../style";
 import set from "lodash.set";
 
 interface FitDItemData
@@ -66,6 +71,14 @@ interface FitDActorSheetDataData extends ASD, PC {
 type FitDActorSheet = ActorSheetData & {
   data: FitDActorSheetDataData;
 };
+
+injectGlobal({
+  ".fitd.sheet.actor.pc.scum-and-villainy": {
+    h1: {
+      borderBottom: "none",
+    },
+  },
+});
 
 export class FitDScumAndVillainyActorSheet extends ActorSheet {
   _vnode: VNode;
@@ -379,8 +392,8 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                         {name}
                       </h6>
                       <SaVRange
-                        style={{ marginLeft: "auto" }}
-                        fontFamily="Metro"
+                        element="parallelogram"
+                        name={name}
                         value={value}
                         max={max}
                         min={min}
@@ -565,8 +578,8 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                       [horizontalList]: true,
                     }}
                   >
-                    <TriangleRange
-                      style={{ flex: "0 0 auto" }}
+                    <SaVRange
+                      element="triangle"
                       name={`move-${name}`}
                       value={value}
                       min={min}
@@ -701,8 +714,10 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
               { name: "resolve", actions: resolveActions },
             ].map(({ name, actions }) => (
               <ul
-                class={{ [`fitd-actor-sheet-${name}`]: true }}
-                style={{ listStyle: "none" }}
+                class={{
+                  [`fitd-actor-sheet-${name}`]: true,
+                  [unstyleList]: true,
+                }}
               >
                 <li class={{ row: true }} style={{ alignItems: "center" }}>
                   <RollButton
@@ -723,6 +738,8 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                     name={name}
                   />
                   <SaVRange
+                    name={name}
+                    element="parallelogram"
                     value={data.xp![name]?.value ?? 0}
                     min={data.xp![name]?.min ?? 0}
                     max={data.xp![name]?.max ?? 0}
@@ -776,7 +793,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
             ))}
           </Grid>
           <Grid name="items-two">
-            <ul>
+            <ul class={{ [unstyleList]: true }}>
               {systemItems.map(
                 ({ _id, name, data: { value, max, linked, min } }) => (
                   <Item
@@ -949,6 +966,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
     }
     console.log("Instantiated");
   }
+
   activateListeners() {}
 }
 

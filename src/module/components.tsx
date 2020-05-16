@@ -1,56 +1,97 @@
 /** @jsx jsx */
-import { jsx } from "snabbdom-jsx-lite";
-import { VNodeData, VNode } from "snabbdom/vnode";
+
+import { jsx, Fragment } from "snabbdom-jsx-lite";
+import type { VNodeData, VNode } from "snabbdom/vnode";
 import { css } from "emotion";
 import { horizontalList, unstyleList } from "../style";
 
 export const Triangle = (filled: boolean) => (filled ? "►" : "▷");
+export const Square = (filled: boolean) => (filled ? "■" : "□");
+export const Parallelogram = (filled: boolean) => (filled ? "▰" : "▱");
 
-export const TriangleRange = ({
+// TODO: need's OldSaVRange's 'fancy' prop
+export const SaVRange = ({
   value,
   min,
   max,
   set,
-  style,
-  ...props
-}: VNodeData & {
+  element,
+  linked,
+  name,
+}: {
   value: number;
+  name: string;
   min: number;
   max: number;
   set: (idx: number) => void;
-}) => (
-  // TODO: see if Fragment exists?
-  <span
-    {...props}
-    style={mergeObject({ display: "inline-flex" }, style)}
-    class={{ "fitd-actor-sheet-triangle-range": true }}
-  >
-    <input
-      props={{
-        type: "range",
-        name,
-        value,
-        min,
-        max,
-        // list: `${name}-list`,
-      }}
-    />
-    <datalist props={{ id: `${name}-list` }}>
-      {Array(max)
-        .fill(undefined)
-        .map((_, idx) => (
-          <option
-            on={{ click: () => set(idx + 1) }}
-            class={{ active: value >= idx + 1 }}
-          >
-            {Triangle(value >= idx + 1)}
-          </option>
-        ))}
-    </datalist>
-  </span>
-);
+  element: "square" | "parallelogram" | "triangle";
+  linked?: boolean;
+}) => {
+  let RangeEl;
+  switch (element) {
+    case "parallelogram":
+      RangeEl = Parallelogram;
+      break;
+    case "square":
+      RangeEl = Square;
+      break;
+    case "triangle":
+      RangeEl = Triangle;
+      break;
+  }
+  return (
+    <Fragment>
+      <input
+        props={{
+          type: "range",
+          name,
+          value,
+          min,
+          max,
+        }}
+        style={{ display: "none" }}
+        attrs={{
+          list: `${name}-list`,
+        }}
+      />
+      <datalist props={{ id: `${name}-list` }}>
+        {Array(max)
+          .fill(undefined)
+          .map((_, idx) => (
+            <option
+              on={{ click: () => set(idx + 1) }}
+              class={{
+                active: value >= idx + 1,
+                [css({
+                  padding: "0",
+                  position: "relative",
+                  fontSize: "1.3em",
+                  fontFamily: "none",
+                })]: true,
+                [css({
+                  "&:not(:last-child)": {
+                    "::after": {
+                      display: "block",
+                      position: "absolute",
+                      width: 8,
+                      height: 1,
+                      background: "red",
+                      top: "50%",
+                      right: 0,
+                    },
+                  },
+                })]: linked,
+              }}
+            >
+              {RangeEl(value >= idx + 1)}
+            </option>
+          ))}
+      </datalist>
+    </Fragment>
+  );
+};
 
-export const SaVRange = ({
+export const OldSaVRange = ({
   value,
   min,
   max,
@@ -175,7 +216,7 @@ export const HorizontalTrack = ({
         {name}
       </span>
     )}
-    <SaVRange
+    <OldSaVRange
       value={value}
       fancy={fancy}
       set={set}
@@ -402,7 +443,15 @@ export const Item = ({
   set: (newValue: number) => void;
 }) => (
   <li {...props} style={mergeObject({ display: "flex" }, style)}>
-    <SaVRange max={max} value={value} linked={linked} set={set} min={min} />{" "}
+    <SaVRange
+      name={name}
+      element="square"
+      max={max}
+      value={value}
+      linked={linked}
+      set={set}
+      min={min}
+    />{" "}
     {name}
   </li>
 );
