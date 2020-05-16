@@ -9,7 +9,7 @@
     "build:watch": "gulp watch",
     "clean": "gulp clean && gulp link --clean",
     "update": "npm install --save-dev gitlab:foundry-projects/foundry-pc/foundry-pc-types",
-    "esbuild": "esbuild src/fitd-scum-and-villainy.ts --bundle --define:global=window '--define:process.env.NODE_ENV=\"development\"' --jsx-factory=jsx --outfile=dist/fitd-scum-and-villainy.js"
+    "esbuild": "esbuild src/fitd-scum-and-villainy.ts --bundle --minify --sourcemap --define:global=window '--define:process.env.NODE_ENV=\"development\"' --jsx-factory=jsx --outfile=dist/fitd-scum-and-villainy.js"
   },
   "author": "",
   "license": "",
@@ -31,6 +31,8 @@
   },
   "dependencies": {
     "emotion": "^10.0.27",
-    "lodash.set": "^4.3.2"
+    "lodash.set": "^4.3.2",
+    "snabbdom": "^0.7.4",
+    "snabbdom-jsx-lite": "^1.0.8"
   }
 }
