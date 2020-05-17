@@ -22,13 +22,63 @@ export const Triangle = (filled: boolean) => {
           "stroke-width": "30px",
           "stroke-linecap": "butt",
           "stroke-linejoin": "miter",
+          filled,
         }}
       />
     </svg>
   );
 };
-export const Square = (filled: boolean) => (filled ? "■" : "□");
-export const Parallelogram = (filled: boolean) => (filled ? "▰" : "▱");
+export const Square = (filled: boolean) => (
+  <svg
+    attrs={{
+      viewBox: "0 0 400 400",
+      width: "1em",
+      height: "1em",
+    }}
+  >
+    <rect
+      attrs={{
+        x: "20",
+        y: "20",
+        width: "370",
+        height: "370",
+        fill: filled ? "var(--fill, white)" : "var(--unfilled, transparent)",
+        stroke: "var(--stroke, white)",
+        "stroke-width": "30px",
+        "stroke-linecap": "butt",
+        "stroke-linejoin": "miter",
+        filled,
+      }}
+    />
+  </svg>
+);
+export const Parallelogram = (filled: boolean) => (
+  <svg
+    attrs={{
+      viewBox: "0 0 400 400",
+      width: "1em",
+      height: "1em",
+    }}
+  >
+    <rect
+      attrs={{
+        x: "170",
+        y: "0",
+        width: "150",
+        height: "400",
+        fill: filled ? "var(--fill, white)" : "var(--unfilled, transparent)",
+        stroke: "var(--stroke, white)",
+        "stroke-width": "30px",
+        "stroke-linecap": "butt",
+        "stroke-linejoin": "miter",
+        filled,
+      }}
+      style={{
+        transform: "skew(-20deg)",
+      }}
+    />
+  </svg>
+);
 
 // TODO: need's OldSaVRange's 'fancy' prop
 export const SaVRange = ({
@@ -73,24 +123,66 @@ export const SaVRange = ({
                 border: "unset",
                 background: "unset",
                 width: "fit-content",
-                height: "fit-content",
-                margin: "0",
-                padding: "0",
+                height: "1em",
+                fontSize: "inherit",
+                margin: 2,
+                padding: 2,
                 display: "flex",
+                cursor: "pointer",
+                ":hover": {
+                  border: "unset",
+                  outline: "unset",
+                  boxShadow: "unset",
+                  "svg polygon:not([filled])": {
+                    fill: "rgba(255, 255, 255, 0.2)",
+                  },
+                },
               })]: true,
               [css({
                 "&:not(:last-child)": {
+                  position: "relative",
                   "::after": {
+                    content: "''",
                     display: "block",
                     position: "absolute",
                     width: 8,
-                    height: 1,
-                    background: "red",
-                    top: "50%",
-                    right: 0,
+                    height: 1.5,
+                    background: "white",
+                    top: "calc(50% + 1.5px)",
+                    right: -6,
                   },
                 },
               })]: linked,
+              [css({
+                svg: {
+                  margin: "-4px -8px",
+                },
+                ":first-child": {
+                  svg: {
+                    marginLeft: 0,
+                  },
+                },
+                ":last-child": {
+                  svg: {
+                    marginRight: 0,
+                  },
+                },
+              })]: element === "parallelogram",
+              [css({
+                svg: {
+                  margin: "0px -3px",
+                },
+                ":first-child": {
+                  svg: {
+                    marginLeft: 0,
+                  },
+                },
+                ":last-child": {
+                  svg: {
+                    marginRight: 0,
+                  },
+                },
+              })]: element === "triangle",
             }}
           >
             {RangeEl(value >= idx + 1)}

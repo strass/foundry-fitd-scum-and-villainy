@@ -718,7 +718,12 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                   [unstyleList]: true,
                 }}
               >
-                <li class={{ row: true }} style={{ alignItems: "center" }}>
+                <li
+                  class={{
+                    row: true,
+                    [css({ fontSize: 20, alignItems: "center" })]: true,
+                  }}
+                >
                   <RollButton
                     fontFamily="Metro"
                     roll={async () => {
