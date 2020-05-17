@@ -9,10 +9,13 @@ module.exports = {
     SharedArrayBuffer: "readonly",
     mergeObject: "readonly",
 
+    // Mine:
+    FitDRoll: "readony",
+
     // Foundry:
     Dialog: "readonly",
     ActorSheet: "readonly",
-    FitDRoll: "readonly",
+    Roll: "readonly",
   },
   parser: "@typescript-eslint/parser",
   parserOptions: {

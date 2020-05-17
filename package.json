@@ -18,7 +18,7 @@
     "@typescript-eslint/parser": "^2.33.0",
     "archiver": "^4.0.1",
     "chalk": "^4.0.0",
-    "esbuild": "^0.3.0",
+    "esbuild": "^0.3.2",
     "eslint": "^7.0.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "^14.1.1",
@@ -37,13 +37,15 @@
     "gulp-typescript": "^6.0.0-alpha.1",
     "json-stringify-pretty-compact": "^2.0.0",
     "sass": "^1.26.5",
-    "typescript": "^3.8.3",
+    "typescript": "^3.9.2",
     "yargs": "^15.3.1"
   },
   "dependencies": {
+    "@emotion/styled": "^10.0.27",
     "emotion": "^10.0.27",
     "lodash.set": "^4.3.2",
     "snabbdom": "^0.7.4",
-    "snabbdom-jsx-lite": "^1.0.8"
+    "snabbdom-jsx-lite": "^1.0.8",
+    "styled-system": "^5.1.5"
   }
 }

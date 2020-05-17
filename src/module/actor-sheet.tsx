@@ -28,6 +28,7 @@ import {
   horizontalList,
 } from "../style";
 import set from "lodash.set";
+import createRollDialog, { RollType } from "./dialogs/roll";
 
 interface FitDItemData
   extends Omit<typeof FITD_TEMPLATE["Item"], "types" | "templates"> {}
@@ -757,17 +758,19 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                     }
                   />
                 </li>
-                {actions.map(({ name, value, max, ...rest }) => (
+                {actions.map(({ name, value, max, min, ...rest }) => (
                   <li>
                     <Action
+                      min={min}
                       name={name}
                       value={value}
                       max={max}
-                      roll={() => {
-                        // @ts-ignore TODO: make global declarations
-                        const roll = FitDRoll(value, { action: name });
-                        console.log(roll);
-                        roll.toMessage();
+                      roll={async () => {
+                        await createRollDialog({
+                          dice: value,
+                          action: name,
+                          type: RollType.action,
+                        }).render(true);
                       }}
                       set={(newValue) => {
                         const idx = allActions.findIndex(
@@ -779,6 +782,7 @@ export class FitDScumAndVillainyActorSheet extends ActorSheet {
                               value: newValue,
                               name,
                               max,
+                              min,
                               ...rest,
                             }),
                           },

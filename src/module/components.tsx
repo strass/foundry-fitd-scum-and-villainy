@@ -5,12 +5,27 @@ import { css } from "emotion";
 import { horizontalList, unstyleList } from "../style";
 
 export const Triangle = (filled: boolean) => {
-  // return (
-  //   <svg attrs={{}}>
-  //     <path attrs={{ d: "m 0 0 h 4 l -2 -3 z" }} attrs-path="test" />
-  //   </svg>
-  // );
-  return filled ? "►" : "▷";
+  return (
+    <svg
+      attrs={{
+        viewBox: "0 0 620 540",
+        width: "1em",
+        height: "calc(1em * 520 / 600)",
+        transform: "rotate(90)",
+      }}
+    >
+      <polygon
+        attrs={{
+          points: "300,0 600,520 0,520",
+          fill: filled ? "var(--fill, white)" : "var(--unfilled, transparent)",
+          stroke: "var(--stroke, white)",
+          "stroke-width": "30px",
+          "stroke-linecap": "butt",
+          "stroke-linejoin": "miter",
+        }}
+      />
+    </svg>
+  );
 };
 export const Square = (filled: boolean) => (filled ? "■" : "□");
 export const Parallelogram = (filled: boolean) => (filled ? "▰" : "▱");
@@ -47,52 +62,40 @@ export const SaVRange = ({
   }
   return (
     <Fragment>
-      <input
-        props={{
-          type: "range",
-          name,
-          value,
-          min,
-          max,
-        }}
-        style={{ display: "none" }}
-        attrs={{
-          list: `${name}-list`,
-        }}
-      />
-      <datalist props={{ id: `${name}-list` }}>
-        {Array(max)
-          .fill(undefined)
-          .map((_, idx) => (
-            <option
-              on={{ click: () => set(idx + 1) }}
-              class={{
-                active: value >= idx + 1,
-                [css({
-                  padding: "0",
-                  position: "relative",
-                  fontSize: "1.3em",
-                  fontFamily: "none",
-                })]: true,
-                [css({
-                  "&:not(:last-child)": {
-                    "::after": {
-                      display: "block",
-                      position: "absolute",
-                      width: 8,
-                      height: 1,
-                      background: "red",
-                      top: "50%",
-                      right: 0,
-                    },
+      {Array(max)
+        .fill(undefined)
+        .map((_, idx) => (
+          <button
+            on={{ click: () => set(idx + 1) }}
+            class={{
+              active: value >= idx + 1,
+              [css({
+                border: "unset",
+                background: "unset",
+                width: "fit-content",
+                height: "fit-content",
+                margin: "0",
+                padding: "0",
+                display: "flex",
+              })]: true,
+              [css({
+                "&:not(:last-child)": {
+                  "::after": {
+                    display: "block",
+                    position: "absolute",
+                    width: 8,
+                    height: 1,
+                    background: "red",
+                    top: "50%",
+                    right: 0,
                   },
-                })]: linked,
-              }}
-            >
-              {RangeEl(value >= idx + 1)}
-            </option>
-          ))}
-      </datalist>
+                },
+              })]: linked,
+            }}
+          >
+            {RangeEl(value >= idx + 1)}
+          </button>
+        ))}
     </Fragment>
   );
 };
